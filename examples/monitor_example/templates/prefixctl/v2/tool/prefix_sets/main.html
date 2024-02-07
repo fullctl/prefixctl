@@ -1,0 +1,6 @@
+{% extends "prefixctl/v2/tool/prefix_sets/main.html" %}
+{% load i18n %}
+{% block "prefix-set-templates" %}
+  {{ block.super }}
+  {% include "prefixctl/v2/tool/prefix_sets/example-monitor-form.html" %}
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "prefixctl/v2/tool/prefix_sets/list.html" %}
+{% load i18n fullctl_util %}
+
+{% block "prefix-set-addon-template" %}
+{{ block.super }}
+<div class="row property" data-template="monlist_example_monitor">
+  <div class="col field">
+    {% trans "Example Monitor" %}: <span class="highlight" data-field="status"></span>
+  </div>
+  <div class="col field">
+  </div>
+  <div class="col-1 field-empty right">
+     <a data-action="edit_prefix_monitor"><span class="icon prefixctl icon-edit"></span></a>
+     <a data-api-action="delete_monitor"
+        data-api-callback="remove"
+        data-confirm="Remove monitor?"
+        data-api-method="DELETE"><span class="icon prefixctl icon-delete"></span></a>
+  </div>
+</div>
+{% endblock %}

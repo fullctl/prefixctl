@@ -1,0 +1,223 @@
+{% load static i18n %}
+<table
+  class="table table-borderless"
+  data-api-base="{% url "prefixctl_api:prefix_set-list" org_tag=request.org.slug %}"
+  data-template="list">
+  <tbody class="list-body">
+  </tbody>
+  <tbody class="templates">
+    <tr data-template="row" class="with-border">
+      <td data-field="name" class="prefix-name highlight"></td>
+      <td data-field="description"></td>
+      <td data-field="controls" class="right">
+        <a data-action="edit_prefix_set" class="btn">
+          <span class="icon prefixctl icon-edit"></span>
+        </a>
+        <a
+          class="btn"
+          data-api-action="{id}"
+          data-api-callback="remove"
+          data-confirm="Remove prefix set?"
+          data-api-method="DELETE">
+            <span class="icon prefixctl icon-delete"></span>
+        </a>
+      </td>
+    </tr>
+    <tr data-template="row" class="monitor-details secondary with-border">
+      <td colspan="4">
+	    <div class="row property">
+	      <div class="col-md-auto field">
+		{% trans "Monitors" %}: <span class="highlight" data-field="num_monitors"></span>
+	      </div>
+	      <div class="col-md-auto field">
+		<a class="button" data-action="add_monitor" class="prefixctl"><span class="label prefixctl">{% trans "Add a monitor to this set" %}</span></a>
+	      </div>
+	      <div class="col field-empty">
+	      </div>
+	      <div class="col-md-auto field">
+		{% trans "Import from IRR" %}:
+		<span data-field="irr_import" data-toggle="checked">
+			<span data-false class="">No</span>
+			<span data-true class="green-text font-weight-bold">Auto</span>
+		</span>
+	      </div>
+	    </div>
+      </td>
+    </tr>
+    <tr data-template="row" class="monlist secondary with-border">
+      <td colspan="4">
+
+      </td>
+    </tr>
+    {% block "prefix-set-addon-row" %}
+    {% endblock %}
+    <tr data-template="row" class="secondary prelist">
+      <td colspan="4">
+	    <div class="row property">
+	      <div class="col-md-auto field-empty">
+		    <a data-action="list_prefixes">
+          <div class="row align-items-center">
+            <div class="col-auto pe-0">
+              <span class="icon prefixctl icon-caret-left"></span>
+            </div>
+            <div class="col label">{% trans "Show / Edit / Add Prefixes" %}</div>
+          </div>
+        </a>
+	      </div>
+	      <div class="col-md-auto field me-1">
+			{% trans "Active" %}: <span class="highlight" data-field="num_prefixes"></span>
+	      </div>
+	      <div class="col-md-auto field me-1">
+          <a class="button" data-action="add_prefixes" class="prefixctl"><span class="label prefixctl">{% trans "Bulk create prefixes" %}</span></a>
+	      </div>
+	      <div class="col-md-auto field">
+          <input type="text" placeholder="Search for prefix.." name="search" class="searchbar">
+	      </div>
+        <div class="col field-empty"></div>
+	      <div class="col-md-auto field-empty">
+		      <label class="mb-0">
+		        <input
+		          type="checkbox"
+		          data-api-base="{% url "prefixctl_api:prefix_set-detail" org_tag=request.org.slug pk="prefixset_id" %}"
+		          data-api-method="PUT"
+		          class="ux-keep-list-open" data-field="ux_keep_list_open">{% trans "Keep List Open" %}
+		      </label>
+	      </div>
+	    </div>
+      </td>
+    </tr>
+    <tr data-template="row" class="padding-row">
+      <td colspan="4">
+
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<div data-template="prefix_monitor_list"
+  data-api-action="monitors"
+  data-api-base="{% url "prefixctl_api:prefix_set-detail" org_tag=request.org.slug pk=0 %}">
+  <div class="list-body"></div>
+
+  <div class="templates">
+    <div data-template="row" class="row property">
+      <div class="col-2 field">
+        {% trans "ASN Monitor" %}:<span class="highlight" data-field="status"></span>
+      </div>
+      <div class="col field">
+        {% trans "Origin" %}:<span class="highlight" data-field="asn_set_origin_name"></span>
+      </div>
+      <div class="col field">
+        {% trans "Upstream" %}:<span class="highlight" data-field="asn_set_upstream_name"></span>
+      </div>
+      <div class="col field">
+        {% trans "AS_PATH" %}:<span class="highlight" data-field="asn_path"></span>
+      </div>
+      <div class="col-3 field">
+        <span>
+          <span class="nowrap">
+            <span class="">{% trans "Specifics" %}: </span>
+            <span data-field="alert_specifics" data-toggle="checked">
+            {% include "common/v2/app/checkbox.html" %}
+            </span>
+          </span>
+          <span class="nowrap">
+            <span class="">{% trans "Dampening" %}:</span>
+            <span data-field="alert_dampening" data-toggle="checked">
+            {% include "common/v2/app/checkbox.html" %}
+            </span>
+          </span>
+        </span>
+      </div>
+      <div class="col-1 field">
+        <span>
+          <span class="nowrap">
+            <span class="">{% trans "ROA" %}:</span>
+            <span data-field="roa_validation" data-toggle="checked">
+            {% include "common/v2/app/checkbox.html" %}
+            </span>
+          </span>
+        </span>
+     </div>
+     <div class="col-1 field-empty right">
+        <a data-action="edit_prefix_monitor"><span class="icon prefixctl icon-edit"></span></a>
+        <a data-api-action="delete_monitor"
+          data-api-callback="remove"
+          data-confirm="Remove monitor?"
+          data-api-method="DELETE"><span class="icon prefixctl icon-delete"></span></a>
+     </div>
+    </div>
+  </div>
+</div>
+
+<table>
+<tbody>
+<tr class="prelist" data-template="prefixes_list"
+  data-api-base="{% url "prefixctl_api:prefix_set-detail" org_tag=request.org.slug pk=0 %}"
+  data-api-action="prefixes">
+  <td colspan="4" class="inner-list-container">
+
+    <div class="list-body grid-col-3 inner-list"></div>
+    <div class="templates">
+      <div class="prefix-container row" data-template="row">
+        <div class="col-md-auto d-inline-flex align-items-center p-0 prefix" data-field="prefix"></div>
+        <div class="col-md-auto d-inline-flex align-items-center p-0 prefix-addon-controls"></div>
+        <div class="col d-flex flex-row-reverse align-items-center p-0">
+            <a class="irr-import-hide"
+              data-api-action="delete_prefix"
+              data-api-callback="remove"
+              data-confirm="{% trans "Delete prefix?" %}"
+              data-api-method="DELETE">
+              <span class="icon prefixctl icon-delete irr-import-hide"></span>
+            </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="control-panel container-fluid">
+      <div class="row">
+        <div class="controls">
+          <div class="alert alert-info irr-import-show">
+          {% blocktrans trimmed %}
+          This prefix set is currenty configured to automatically import prefixes through
+          IRR. Manual prefix management has been disabled.
+          {% endblocktrans %}
+          </div>
+
+          <form class="irr-import-hide container-fluid me-2"
+            data-api-base="{% url "prefixctl_api:prefix_set-detail" org_tag=request.org.slug pk=0 %}"
+            data-api-action="add_prefix"
+            data-api-method="POST">
+            <div class="row justify-content-end">
+              <div class="col-2 me-sm-2 p-0">
+                <div class="input-group" data-api-submit="yes">
+                  <input type="text" placeholder="{% trans "Prefix" %}" class="form-control" id="prefix" name="prefix" />
+                </div>
+              </div>
+              <div class="col-2 me-sm-2 p-0 hidden mask-length-range-col">
+                <div class="input-group" data-api-submit="yes">
+                  <input type="text" placeholder="{% trans "Mask Length Range" %}" class="form-control" id="mask_length_range" name="mask_length_range" />
+                </div>
+              </div>
+              <div class="col-md-auto my-auto">
+                <button class="btn btn-expand" title="toggle controls">
+                  <span class="icon icon-options"></span>
+                </button>
+              </div>
+              <div class="col-md-auto">
+                <div class="row h-100">
+                  <button type="button" class="submit secondary btn mx-1 small">{% trans "Add" %}</button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </td>
+</tr>
+</tbody>
+</table>
+
+{% block "prefix-set-addon-template" %}
+{% endblock %}

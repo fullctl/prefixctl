@@ -1,0 +1,56 @@
+{% load static i18n %}
+<form data-template="form_prefix_set"
+  data-api-base="{% url "prefixctl_api:prefix_set-list" org_tag=request.org.slug %}"
+  data-api-method="POST"
+  >
+  <div class="container-fluid">
+    <div class="row mb-3">
+      <div class="col-12" data-api-submit="yes">
+        <label for="name" class="form-label">{% trans "Name" %}</label>
+        <input type="text" class="form-control" id="name" name="name" />
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col-12" data-api-submit="yes">
+        <label for="description" class="form-label">{% trans "Description" %}</label>
+        <input type="text" class="form-control" id="description" name="description" />
+      </div>
+    </div>
+    <div class="row form-check">
+      <div class="col-12" data-api-submit="yes">
+        <input type="checkbox" class="form-check-input" id="irr-import" name="irr_import" />
+        <label for="irr-import" class="form-check-label">{% trans "Automatic import from IRR" %}</label>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <div class="alert alert-info">
+        {% blocktrans %}
+          Prefixes will be imported automatically - this is not instant, please give it a few
+          minutes after enabling / changing these settings.
+          {% endblocktrans %}
+        </div>
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col-12" data-api-submit="yes">
+        <label for="irr-as-set" class="form-label">{% trans "IRR Import AS-SET" %}</label>
+        <input type="text" class="form-control" id="irr-as-set" name="irr_as_set" />
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col-12" data-api-submit="yes">
+        <label for="irr-sources" class="form-label">{% trans "IRR Import Sources" %}</label>
+        <input type="text" class="form-control" id="irr-sources" name="irr_sources" />
+      </div>
+    </div>
+
+    <!-- hidden payload -->
+    <div class="row form-check" style="display:none">
+      <div class="col-12" data-api-submit="yes">
+        <input type="checkbox" class="form-check-input" id="ux-keep-list-open" name="ux_keep_list_open" />
+        <label for="ux-keep-list-open" class="form-check-label">{% trans "Keep list open" %}</label>
+      </div>
+    </div>
+  </div>
+</form>

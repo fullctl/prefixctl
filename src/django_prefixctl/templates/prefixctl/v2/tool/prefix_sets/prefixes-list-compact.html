@@ -1,0 +1,40 @@
+{% load static i18n %}
+<div data-template="compact_prefixes">
+  <table
+    class="table table-sm"
+    data-api-base="{% url "prefixctl_api:prefix_set-prefixes" org_tag=request.org.slug pk=0 %}">
+    <thead>
+      <tr>
+        <th>{% trans "Prefix" %}</th>
+        <th>{% trans "Mask Length Range" %}</th>
+      </tr>
+    </thead>
+    <tbody class="list-body">
+    </tbody>
+    <tbody class="templates">
+      <tr data-template="row">
+        <td data-field="prefix" class="highlight"></td>
+        <td data-field="mask_length_range"></td>
+      </tr>
+      </tr>
+    </tbody>
+  </table>
+
+  <form class="form-inline flex-row-reverse"
+    data-api-base="{% url "prefixctl_api:prefix_set-detail" org_tag=request.org.slug pk=0 %}"
+    data-api-action="add_prefix"
+    data-api-method="POST">
+    <div class="input-group mb-2 me-sm-2" data-api-submit="yes">
+      <input type="text" placeholder="{% trans "Mask Length Range" %}" class="form-control" id="mask_length_range" name="mask_length_range" />
+      <div class="input-group-append">
+        <button type="button" class="submit">{% trans "Add" %}</button>
+      </div>
+
+    </div>
+    <div class="input-group mb-2 me-sm-2" data-api-submit="yes">
+      <input type="text" placeholder="{% trans "Prefix" %}" class="form-control" id="prefix" name="prefix" />
+    </div>
+  </form>
+
+</div>
+

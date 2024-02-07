@@ -1,0 +1,59 @@
+{% load static i18n %}
+<form data-template="form_prefix_monitor"
+  data-api-base="{% url "prefixctl_api:monitor-list" org_tag=request.org.slug %}"
+  data-api-method="POST"
+  >
+  <div data-api-submit="yes">
+    <input type="hidden" name="monitor_type" value="prefix_monitor" />
+  </div>
+
+  <div class="row mb-3">
+    <div class="col-12" data-api-submit="yes">
+      <label for="asn_set_origin" class="form-label">{% trans "Origin ASN Set" %}</label>
+      <span class="modal-control">
+        <img class="caret" src="{% static "common/icons/ui-caret-caret/down.svg" %}">
+        <select data-api-base="{% url "prefixctl_api:asn_set-list" org_tag=request.org.slug %}" class="form-control" id="asn_set_origin" name="asn_set_origin"></select>
+      </span>
+    </div>
+  </div>
+  <div class="row mb-3">
+    <div class="col-12" data-api-submit="yes">
+      <label for="asn_set_upstream" class="form-label">{% trans "Upstream ASN Set" %}</label>
+      <span class="modal-control">
+        <img class="caret" src="{% static "common/icons/ui-caret-caret/down.svg" %}">
+        <select data-api-base="{% url "prefixctl_api:asn_set-list" org_tag=request.org.slug %}" class="form-control" id="asn_set_upstream" name="asn_set_upstream"></select>
+      </span>
+    </div>
+  </div>
+  <div class="row mb-3">
+    <div class="col-12" data-api-submit="yes">
+      <label for="asn_path" class="form-label">{% trans "AS_PATH" %}</label>
+      <input type="text" class="form-control" id="asn_path" name="asn_path" />
+    </div>
+  </div>
+
+  <div class="row form-check">
+    <div class="col-12" data-api-submit="yes">
+      <input type="checkbox" class="form-check-input" id="alert_specifics" name="alert_specifics" />
+      <label for="alert_specifics" class="form-check-label">{% trans "Alert on more specifics" %}</label>
+    </div>
+  </div>
+
+  <div class="row form-check">
+    <div class="col-12" data-api-submit="yes">
+      <input type="checkbox" class="form-check-input" id="alert_dampening" name="alert_dampening" />
+      <label for="alert_dampening" class="form-check-label">{% trans "Alert on dampening (stability)"%}</label>
+    </div>
+  </div>
+
+  <div class="row form-check">
+    <div class="col-12" data-api-submit="yes">
+      <input type="checkbox" class="form-check-input" id="roa_validation" name="roa_validation" />
+      <label for="roa_validation" class="form-check-label">{% trans "ROA validation" %}</label>
+    </div>
+  </div>
+
+
+</form>
+
+

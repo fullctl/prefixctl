@@ -1,0 +1,17 @@
+{% load static i18n %}
+<div class="tool" data-component="prefix_sets" data-grainy-remove="prefix_set.{{ request.org.permission_id }}">
+
+  {% include "common/v2/tool_base.html" %}
+
+  <div class="templates">
+  {% block "prefix-set-templates" %}
+    {% include "prefixctl/v2/tool/prefix_sets/menu.html" %}
+    {% include "prefixctl/v2/tool/prefix_sets/list.html" %}
+    {% include "prefixctl/v2/tool/prefix_sets/prefix-set-form.html" %}
+    {% include "prefixctl/v2/tool/prefix_sets/prefix-monitor-form.html" %}
+    {% include "prefixctl/v2/tool/prefix_sets/select-prefix-monitor-form.html" %}
+    {% include "prefixctl/v2/tool/prefix_sets/bottom-menu.html" %}
+    {% include "prefixctl/v2/tool/prefix_sets/bulk-create-prefixes-form.html" %}
+  {% endblock %}
+  </div>
+</div>

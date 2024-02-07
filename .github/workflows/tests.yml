@@ -1,0 +1,39 @@
+name: tests
+
+on: [push, pull_request]
+
+jobs:
+
+  linting:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install virtualenv from poetry
+        uses: 20c/workflows/poetry@v1
+      # poetry run pre-commit run --all-files
+      - name: Run linters
+        run: |
+          poetry run isort .
+          poetry run black --check src/
+#            poetry run pre-commit run --all-files
+
+  test:
+    needs: linting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Copy .env file
+        run: cp Ctl/dev/example.env Ctl/dev/.env
+      - name: Launch database container
+        run: Ctl/dev/compose.sh up -d postgres
+      - name: Build container
+        run: Ctl/dev/compose.sh build django
+      - name: Run tests
+        run: Ctl/dev/run.sh run_tests
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./src/coverage.xml
+          fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}

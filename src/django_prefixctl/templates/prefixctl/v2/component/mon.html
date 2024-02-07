@@ -1,0 +1,52 @@
+{% load i18n %}
+<div class="component mon">
+  <div class="loading-shim"></div>
+  <div class="app-bar">
+    <div class="row">
+      <div class="col-sm">
+        <h5>{% trans "Monitors" %}</h5>
+      </div>
+      <div class="col-sm right">
+      </div>
+    </div>
+  </div>
+  <table
+    class="table table-striped table-sm"
+    data-sort-container="tbody"
+    data-sort-row=".listitem">
+    <thead>
+      <tr>
+        <th scope="col"></th>
+        <th scope="col" data-sort-target=".prefix_set">{% trans "Prefix Set" %}</th>
+        <th scope="col" data-sort-target=".asn_set_origin">{% trans "Origin AS Set" %}</th>
+        <th scope="col" data-sort-target=".asn_set_upstream">{% trans "Upstream AS Set" %}</th>
+        <th scope="col"></th>
+      </tr>
+    </thead>
+    <tbody class="api-list-body">
+    </tbody>
+  </table>
+
+  <p class="center">
+    <button type="button" class="btn btn-primary btn-xs btn-add">{% trans "Add Monitor" %}</button>
+  </p>
+</div>
+
+<table>
+  <tr class="listitem mon">
+    <td>
+      <button type="button" class="btn btn-danger btn-xs" data-action="delete_remote">
+        <span>Remove</span>
+      </button>
+    </td>
+    <td scope="col" class="prefix_set" name="prefix_set"></td>
+    <td scope="col" class="asn_set_origin" name="asn_set_origin"></td>
+    <td scope="col" class="asn_set_upstream" name="asn_set_upstream"></td>
+    <td class="right">
+      <button type="button" class="btn btn-primary btn-xs" data-action="edit">
+        <span>{% trans "Edit" %}</span>
+      </button>
+    </td>
+  </tr>
+</table>
+

@@ -1,0 +1,17 @@
+{% load static i18n %}
+<form data-template="form_example_monitor"
+  data-api-base="{% url "prefixctl_api:monitor-list" org_tag=request.org.slug %}"
+  data-api-method="POST"
+  >
+
+  <!--
+    this only exists so we can display validation errors keyed
+    to the prefix set
+  -->
+  <input type="hidden" id="prefix_set" name="prefix_set" />
+
+  <div data-api-submit="yes" style="margin-top:10px">
+    <input type="hidden" name="monitor_type" value="example_monitor" />
+  </div>
+
+</form>

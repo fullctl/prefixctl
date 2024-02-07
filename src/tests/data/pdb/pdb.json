@@ -1,0 +1,290 @@
+[
+{
+  "model": "django_peeringdb.organization",
+  "pk": 10356,
+  "fields": {
+    "status": "ok",
+    "created": "2014-11-17T20:59:34Z",
+    "updated": "2018-04-26T23:53:42Z",
+    "version": 0,
+    "address1": "",
+    "address2": "",
+    "city": "Chicago",
+    "state": "IL",
+    "zipcode": "",
+    "country": "US",
+    "latitude": null,
+    "longitude": null,
+    "name": "20C, LLC",
+    "website": "http://20c.com",
+    "notes": ""
+  }
+},
+{
+  "model": "django_peeringdb.organization",
+  "pk": 10843,
+  "fields": {
+    "status": "ok",
+    "created": "2015-02-24T03:54:47Z",
+    "updated": "2016-03-23T10:41:08Z",
+    "version": 0,
+    "address1": "",
+    "address2": "",
+    "city": "Chicago",
+    "state": "IL",
+    "zipcode": "60654",
+    "country": "US",
+    "latitude": null,
+    "longitude": null,
+    "name": "United IX",
+    "website": "https://unitedix.net/",
+    "notes": ""
+  }
+},
+{
+  "model": "django_peeringdb.organization",
+  "pk": 34,
+  "fields": {
+    "status": "ok",
+    "created": "2010-07-29T05:00:00Z",
+    "updated": "2019-01-20T14:25:45Z",
+    "version": 0,
+    "address1": "1001 17th Street",
+    "address2": "Suite 500",
+    "city": "Denver",
+    "state": "CO",
+    "zipcode": "80202",
+    "country": "US",
+    "latitude": null,
+    "longitude": null,
+    "name": "CoreSite LLC",
+    "website": "http://www.coresite.com",
+    "notes": ""
+  }
+},
+{
+  "model": "django_peeringdb.network",
+  "pk": 20,
+  "fields": {
+    "status": "ok",
+    "created": "2014-11-17T20:59:34Z",
+    "updated": "2019-02-23T06:12:20Z",
+    "version": 0,
+    "asn": 63311,
+    "name": "20C",
+    "aka": "20C",
+    "irr_as_set": "AS-20C",
+    "website": "http://20c.com",
+    "looking_glass": "",
+    "route_server": "",
+    "notes": "",
+    "notes_private": "",
+    "info_traffic": "",
+    "info_ratio": "Balanced",
+    "info_scope": "Global",
+    "info_type": "Enterprise",
+    "info_prefixes4": 200,
+    "info_prefixes6": 50,
+    "info_unicast": true,
+    "info_multicast": false,
+    "info_ipv6": true,
+    "info_never_via_route_servers": false,
+    "policy_url": "",
+    "policy_general": "Selective",
+    "policy_locations": "Not Required",
+    "policy_ratio": false,
+    "policy_contracts": "Not Required",
+    "org": 10356
+  }
+},
+{
+  "model": "django_peeringdb.internetexchange",
+  "pk": 240,
+  "fields": {
+    "status": "ok",
+    "created": "2010-07-29T05:00:00Z",
+    "updated": "2020-01-10T23:51:28Z",
+    "version": 0,
+    "name": "BosIX",
+    "name_long": "Boston Internet Exchange",
+    "city": "Boston",
+    "country": "US",
+    "notes": "",
+    "region_continent": "North America",
+    "media": "Ethernet",
+    "proto_unicast": true,
+    "proto_multicast": true,
+    "proto_ipv6": true,
+    "website": "https://unitedix.net/location/boston",
+    "url_stats": "https://unitedix.net/location/boston/networks",
+    "tech_email": "neteng@unitedix.net",
+    "tech_phone": "",
+    "policy_email": "peering@unitedix.net",
+    "policy_phone": "",
+    "org": 10843
+  }
+},
+{
+  "model": "django_peeringdb.internetexchange",
+  "pk": 239,
+  "fields": {
+    "status": "ok",
+    "created": "2010-07-29T05:00:00Z",
+    "updated": "2020-01-10T23:51:28Z",
+    "version": 0,
+    "name": "ChIX",
+    "name_long": "Chicago Internet Exchange",
+    "city": "Chicago",
+    "country": "US",
+    "notes": "",
+    "region_continent": "North America",
+    "media": "Ethernet",
+    "proto_unicast": true,
+    "proto_multicast": true,
+    "proto_ipv6": true,
+    "website": "https://unitedix.net/location/chicago",
+    "url_stats": "https://unitedix.net/location/chicago/networks",
+    "tech_email": "neteng@unitedix.net",
+    "tech_phone": "",
+    "policy_email": "peering@unitedix.net",
+    "policy_phone": "",
+    "org": 10843
+  }
+},
+
+{
+  "model": "django_peeringdb.facility",
+  "pk": 440,
+  "fields": {
+    "status": "ok",
+    "created": "2010-07-29T05:00:00Z",
+    "updated": "2018-06-12T06:07:56Z",
+    "version": 0,
+    "address1": "427 S. LaSalle",
+    "address2": "",
+    "city": "Chicago",
+    "state": "IL",
+    "zipcode": "60605",
+    "country": "US",
+    "latitude": "41.876212",
+    "longitude": "-87.631453",
+    "name": "CoreSite - Chicago (CH1)",
+    "website": "http://www.coresite.com",
+    "clli": "",
+    "rencode": "",
+    "npanxx": "",
+    "notes": "",
+    "org": 34
+  }
+},
+{
+  "model": "django_peeringdb.ixlan",
+  "pk": 239,
+  "fields": {
+    "status": "ok",
+    "created": "2010-07-29T05:00:00Z",
+    "updated": "2016-03-23T16:53:43Z",
+    "version": 0,
+    "name": "",
+    "descr": "",
+    "mtu": 1500,
+    "vlan": null,
+    "dot1q_support": true,
+    "rs_asn": 0,
+    "arp_sponge": null,
+    "ix": 239
+  }
+},
+{
+  "model": "django_peeringdb.ixlan",
+  "pk": 240,
+  "fields": {
+    "status": "ok",
+    "created": "2010-07-29T05:00:00Z",
+    "updated": "2016-03-23T16:53:43Z",
+    "version": 0,
+    "name": "",
+    "descr": "",
+    "mtu": 1500,
+    "vlan": null,
+    "dot1q_support": true,
+    "rs_asn": 0,
+    "arp_sponge": null,
+    "ix": 240
+  }
+},
+{
+  "model": "django_peeringdb.internetexchangefacility",
+  "pk": 960,
+  "fields": {
+    "status": "ok",
+    "created": "2016-03-23T10:41:24Z",
+    "updated": "2016-03-23T10:41:24Z",
+    "version": 0,
+    "ix": 239,
+    "fac": 440
+  }
+},
+{
+  "model": "django_peeringdb.networkfacility",
+  "pk": 19929,
+  "fields": {
+    "status": "ok",
+    "created": "2016-04-06T12:26:50Z",
+    "updated": "2016-04-06T12:26:50Z",
+    "version": 0,
+    "local_asn": 63311,
+    "avail_sonet": false,
+    "avail_ethernet": false,
+    "avail_atm": false,
+    "net": 20,
+    "fac": 440
+  }
+},
+{
+  "model": "django_peeringdb.networkixlan",
+  "pk": 21608,
+  "fields": {
+    "status": "ok",
+    "created": "2015-01-29T06:00:00Z",
+    "updated": "2017-10-24T22:24:02Z",
+    "version": 0,
+    "asn": 63311,
+    "ipaddr4": "206.41.110.20",
+    "ipaddr6": "2001:504:41:110::20",
+    "is_rs_peer": true,
+    "notes": "",
+    "speed": 10000,
+    "net": 20,
+    "ixlan": 239
+  }
+},
+{
+  "model": "django_peeringdb.ixlanprefix",
+  "pk": 605,
+  "fields": {
+    "status": "ok",
+    "created": "2015-01-29T06:00:00Z",
+    "updated": "2016-03-15T02:15:51Z",
+    "version": 0,
+    "notes": "",
+    "protocol": "IPv6",
+    "prefix": "2001:504:41:110::/64",
+    "ixlan": 239
+  }
+},
+{
+  "model": "django_peeringdb.ixlanprefix",
+  "pk": 556,
+  "fields": {
+    "status": "ok",
+    "created": "2014-10-18T05:00:00Z",
+    "updated": "2016-03-15T02:38:46Z",
+    "version": 0,
+    "notes": "",
+    "protocol": "IPv4",
+    "prefix": "206.41.110.0/24",
+    "ixlan": 239
+  }
+}
+]

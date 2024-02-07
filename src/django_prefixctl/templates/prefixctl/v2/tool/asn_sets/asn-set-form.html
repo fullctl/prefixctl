@@ -1,0 +1,22 @@
+{% load static i18n %}
+<form data-template="form_asn_set"
+  data-api-base="{% url "prefixctl_api:asn_set-list" org_tag=request.org.slug %}"
+  data-api-method="POST"
+  >
+  <div class="container-fluid">
+    <div class="row mb-3">
+      <div class="col-12" data-api-submit="yes">
+        <label for="name" class="form-label">{% trans "Name" %}</label>
+        <input type="text" class="form-control" id="name" name="name" />
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col-12" data-api-submit="yes">
+        <label for="description" class="form-label">{% trans "Description" %}</label>
+        <input type="text" class="form-control" id="description" name="description" />
+      </div>
+    </div>
+  </div>
+</form>
+
+

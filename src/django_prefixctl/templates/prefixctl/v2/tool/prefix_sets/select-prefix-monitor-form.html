@@ -1,0 +1,16 @@
+{% load static i18n %}
+<form data-template="form_prefix_monitor_type">
+  <div class="row mb-3">
+    <div class="col-12">
+      <label for="monitor_type" class="form-label">{% trans "Monitor type" %}</label>
+      <span class="modal-control">
+        <img class="caret" src="{% static "common/icons/ui-caret-caret/down.svg" %}">
+        <select class="form-control" id="monitor_type" name="monitor_type">
+        {% for mon in PREFIX_MONITOR_CLASSES %}
+          <option value="{{ mon.tag }}">{{ mon.title }}</option>
+        {% endfor %}
+        </select>
+      </span>
+    </div>
+  </div>
+</form>

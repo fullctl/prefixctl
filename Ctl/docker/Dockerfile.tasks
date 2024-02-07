@@ -1,0 +1,151 @@
+
+ARG virtual_env=/venv
+ARG install_to=/srv/service
+ARG build_deps=""
+ARG poetry_pin="==1.4.1"
+ARG python_ver=3.11
+
+ARG build_deps=" \
+    gcc \
+    git \
+    "
+
+ARG run_deps=" \
+    bgpq4 \
+    "
+ARG uid=6300
+ARG user=fullctl
+
+FROM python:${python_ver}-slim as base
+
+ARG virtual_env
+ARG install_to
+
+ENV SERVICE_HOME=$install_to
+ENV VIRTUAL_ENV=$virtual_env
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+
+
+# build container
+FROM base as builder
+
+# ** from fullctl-builder
+ARG build_deps
+ARG poetry_pin
+
+RUN apt-get update \
+    && apt-get upgrade -y \
+    && apt-get install --no-install-recommends -y ${build_deps} \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+
+# Use Pip to install Poetry
+RUN python3 -m pip install --upgrade pip && pip install "poetry$poetry_pin"
+
+# Create a VENV
+RUN python3 -m venv "$VIRTUAL_ENV"
+
+WORKDIR /build
+
+# poetry install
+COPY pyproject.toml poetry.lock ./
+
+# Need to upgrade pip and wheel within Poetry for all its installs
+RUN poetry run pip install --upgrade pip wheel
+# ** / fullctl-builder
+
+
+ARG extra_pip_install_dir
+
+# only these two individual files before install instead for caching
+COPY pyproject.toml poetry.lock ./
+
+# Need to upgrade pip and wheel within Poetry for all its installs
+RUN poetry install --no-root --only main,tasks
+
+# RUN pip --no-cache-dir install playwright
+
+COPY Ctl/VERSION Ctl/
+
+# gitignore is just a placeholder for if extra is empty
+# this will trigger a cache invalidate
+COPY .gitignore $extra_pip_install_dir ./plugins/
+RUN test -z "$extra_pip_install_dir" || pip install plugins/*.tar.gz
+
+#### final image
+
+FROM base as final
+
+ARG run_deps
+ARG run_dirs=".cache locale media static"
+ARG playwright_deps=" \
+    libglib2.0-0 \
+    libnss3 \
+    libnspr4 \
+    libatk1.0-0 \
+    libatk-bridge2.0-0 \
+    libcups2 \
+    libdrm2 \
+    libdbus-1-3 \
+    libatspi2.0-0 \
+    libx11-6 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxext6 \
+    libxfixes3 \
+    libxrandr2 \
+    libgbm1 \
+    libxcb1 \
+    libxkbcommon0 \
+    libpango-1.0-0 \
+    libcairo2 \
+    libasound2 \
+    "
+ARG uid
+ARG user
+
+# extra settings file if needed
+# TODO keep in until final production deploy
+ARG COPY_SETTINGS_FILE=mainsite/settings/dev.py
+
+RUN useradd -lu $uid $user
+
+WORKDIR $SERVICE_HOME
+COPY --from=builder "$VIRTUAL_ENV" "$VIRTUAL_ENV"
+
+RUN mkdir -p etc $run_dirs
+COPY Ctl/VERSION etc/
+COPY docs/ docs
+
+RUN chown -R $uid:$uid $run_dirs
+
+# add dependencies
+RUN apt-get update \
+    && apt-get install --no-install-recommends -y ${run_deps} ${playwright_deps} \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+
+#### entry point from final image, not tester
+FROM final
+
+ARG uid
+ENV HOME=$SERVICE_HOME
+
+COPY src/ main/
+COPY Ctl/docker/entrypoint.sh .
+RUN ln -s "$SERVICE_HOME/entrypoint.sh" /entrypoint
+RUN ln -s /venv "$SERVICE_HOME/venv"
+
+COPY Ctl/docker/django-uwsgi.ini etc/
+COPY Ctl/docker/manage.sh /usr/bin/manage
+
+#ENV UWSGI_SOCKET=127.0.0.1:6002
+
+USER $uid
+# installs to user home
+RUN playwright install chromium
+
+ENTRYPOINT ["/entrypoint"]
+CMD ["runserver"]

@@ -1,0 +1,127 @@
+{% load static i18n %}
+<table
+  class="table list-table table-borderless"
+  data-api-base="{% url "prefixctl_api:asn_set-list" org_tag=request.org.slug %}"
+  data-template="list">
+
+  <tbody class="list-body">
+  </tbody>
+
+  <tbody class="templates">
+    <tr data-template="row" class="firefox-border-bugfix">
+      <td data-field="name" class="highlight"></td>
+      <td data-field="description"></td>
+      </td>
+      <td class="monitors">
+      </td>
+      <td data-field="controls" class="right">
+          <a class="button btn" data-hover="show" data-action="add_monitor" data-btn-type="secondary">
+            <span class="icon prefixctl icon-add"></span>
+            <span class="label ms-1">Add Monitor</span>
+          </a>
+          <a class="button btn" data-hover="show" data-action="edit_asn_set">
+            <span class="icon prefixctl icon-edit"></span>
+          </a>
+          <a class="button btn" data-hover="show"
+            data-api-action="{id}"
+            data-api-callback="remove"
+            data-confirm="Remove ASN set?"
+            data-api-method="DELETE"
+          >
+            <span class="icon prefixctl icon-delete"></span>
+          </a>
+          <a class="button btn" data-hover="show" data-action="list_asns">
+            <span class="icon prefixctl icon-list"></span>
+          </a>
+          <button class="btn">
+            <span class="icon icon-options"></span>
+          </button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<div data-template="asn_monitor_list"
+  data-api-action="monitors"
+  data-api-base="{% url "prefixctl_api:asn_set-detail" org_tag=request.org.slug pk=0 %}">
+  <div class="list-body"></div>
+  <div class="list-empty">
+    <div class="row property">
+      <div class="col field">
+        {% trans "Monitor" %}: <span class="inactive">{% trans "None" %}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="templates">
+    <div data-template="row" class="row property" style="margin-top: 0px">
+      <div class="col-2 field">
+        {% trans "Monitor" %}: <span class="highlight" data-field="status"></span>
+      </div>
+      <div class="col-3 field">
+        <span>
+          <span class="nowrap">
+            <span class="">{% trans "New prefix detection" %}</span>:
+            <span data-field="new_prefix_detection" data-toggle="checked">
+            {% include "common/v2/app/checkbox.html" %}
+            </span>
+          </span>
+        </span>
+     </div>
+     <div class="col field-empty right">
+        <a data-action="edit_asn_monitor"><span class="icon prefixctl icon-edit"></span></a>
+        <a data-api-action="delete_monitor"
+          data-api-callback="remove"
+          data-confirm="Remove monitor?"
+          data-api-method="DELETE"><span class="icon prefixctl icon-delete"></span></a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<table>
+<tbody>
+<tr data-template="asns_list"
+  data-api-base="{% url "prefixctl_api:asn_set-detail" org_tag=request.org.slug pk=0 %}"
+  data-api-action="asns"
+  >
+  <td colspan="5" class="inner-list-container">
+    <div>
+      <div class="grid-col-3 text-center text-uppercase">
+        <div>{% trans "ASN / Network name" %}</div>
+        <div>{% trans "ASN / Network name" %}</div>
+        <div>{% trans "ASN / Network name" %}</div>
+      </div>
+
+    <div class="list-body grid-col-3 inner-list"></div>
+    <div class="controls">
+      <form
+        data-api-base="{% url "prefixctl_api:asn_set-detail" org_tag=request.org.slug pk=0 %}"
+        data-api-action="add_asn"
+        data-api-method="POST">
+          <div class="input-group justify-content-end mb-2 me-0" data-api-submit="yes">
+            <select name="asn" data-autocomplete-light-language="en-US" data-autocomplete-light-function="select2" id="id_asn" required data-autocomplete-light-url="/autocomplete/pdb/asn">
+            </select>
+            <button type="button" class="submit p-1 action">{% trans "Add" %}</button>
+          </div>
+      </form>
+    </div>
+
+    <div class="templates">
+      <div data-template="row">
+        AS<span data-field="asn"></span>
+        <span data-field="name" class="empty-questionmark"></span>
+        <a class=""
+          data-api-action="delete_asn"
+          data-api-callback="remove"
+          data-confirm="{% trans "Remove ASN from set?" %}"
+          data-api-method="DELETE">
+          <span class="icon prefixctl icon-delete "></span>
+        </a>
+      </div>
+
+    </div>
+  </td>
+</tr>
+</tbody>
+</table>

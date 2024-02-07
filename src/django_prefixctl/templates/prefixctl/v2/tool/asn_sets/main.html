@@ -1,0 +1,16 @@
+{% load static i18n %}
+<div class="tool mt-5" data-component="asn_sets" data-grainy-remove="asn_set.{{ request.org.permission_id }}">
+
+  {% include "common/v2/tool_base.html" %}
+
+  <div class="templates">
+
+    {% include "prefixctl/v2/tool/asn_sets/menu.html" %}
+    {% include "prefixctl/v2/tool/asn_sets/list.html" %}
+    {% include "prefixctl/v2/tool/asn_sets/asn-set-form.html" %}
+    {% include "prefixctl/v2/tool/asn_sets/asn-monitor-form.html" %}
+    {% include "prefixctl/v2/tool/asn_sets/bottom-menu.html" %}
+    {% include "common/v2/app/delete_selected.html" %}
+
+  </div>
+</div>

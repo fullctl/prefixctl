@@ -1,0 +1,134 @@
+.prelist {
+  position: relative;
+}
+
+tr.prelist {
+  border-left: 1px solid;
+  border-right: 1px solid var(--clr-border-400);
+}
+
+.padding-row td{
+  border: none;
+  height: var(--size-500);
+}
+
+.inner-list-container .inner-list .prefix-container {
+  background-color: var(--th-bg);
+  border-radius: var(--size-100);
+  padding: var(--size-200) var(--size-400);
+  margin: 0 var(--size-400);
+}
+
+@media screen and (min-width: 94em) {
+  .inner-list-container .inner-list .prefix-container {
+    margin: 0 var(--size-500);
+  }
+}
+
+.prefix-container a,
+.prefix-container span {
+  display: inline-block;
+}
+
+.prefix-container .dropdown-toggle {
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+
+.prefix-container .dropdown-toggle:focus {
+  border-color: var(--clr-border-400);
+  box-shadow: none;
+}
+
+.prefix-container .dropdown-toggle::after {
+  display: none;
+}
+
+.with-border {
+  border: 1px solid var(--clr-border-400);
+}
+
+.prefix {
+  text-decoration: underline;
+}
+
+.tool[data-component="prefix_sets"] table tr:not(.secondary) td {
+  padding: var(--size-400);
+  vertical-align: middle;
+}
+
+.tool[data-component="prefix_sets"] table a.btn {
+  background: transparent;
+  border-radius: 100vmax;
+  display: inline-flex;
+  border: 1px solid;
+  border-color: var(--clr-border-400);
+  padding: var(--size-100);
+  margin-right: var(--size-100);
+  margin-bottom: var(--size-50);
+  margin-top: var(--size-50);
+}
+
+.inner-list-head div {
+  text-align: center;
+}
+
+form[data-api-action="add_asn"] .input-group > button.submit {
+  border-radius: 0;
+  border: 1px solid;
+  margin-left: var(--size-100);
+  border-color: var(--clr-border-400);
+  background-color: transparent;
+  padding: 0;
+}
+
+[data-component="main"] .inner-list > div{
+  text-align: center;
+}
+
+tr.monitor-details td div.row div{
+  border-right: 1px solid var(--clr-border-400);
+}
+
+.with-border.orange-border {
+  border-left: 4px solid var(--clr-accent-500);
+}
+
+.rep-issues {
+  background:  var(--clr-accent-500) !important;
+}
+
+.with-border.green-border {
+  border-left: 4px solid var(--clr-accent-400);
+}
+
+.rep-ok {
+  background:  var(--clr-accent-400) !important;
+}
+
+.rep-issues,
+.rep-ok {
+  border: none !important;
+  color: #000;
+}
+
+.field.rep-status.rep-issues,
+.field.rep-status.rep-ok {
+  color: #000;
+}
+
+td[data-field="country"] a {
+  color: var(--foreground);
+}
+
+.prefix-addon-controls {
+  margin-left: 1ch;
+}
+
+/* ASN Sets */
+
+/* TODO: remove when https://bugzilla.mozilla.org/show_bug.cgi?id=1000435 is fixed */
+tr.firefox-border-bugfix {
+  border: 1px solid var(--clr-border-400);
+}
