@@ -1,0 +1,8 @@
+---
+cfg:
+  rs_as: 63312
+  router_id: 192.168.0.2
+  filtering:
+    max_as_path_len: 30
+    rpki_bgp_origin_validation:
+      enabled: true

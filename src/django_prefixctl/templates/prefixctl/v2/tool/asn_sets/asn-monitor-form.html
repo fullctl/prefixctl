@@ -1,0 +1,20 @@
+{% load static i18n %}
+<form data-template="form_asn_monitor"
+  data-api-base="{% url "prefixctl_api:monitor-list" org_tag=request.org.slug %}"
+  data-api-method="POST"
+  >
+  <div data-api-submit="yes">
+    <input type="hidden" name="monitor_type" value="asn_monitor" />
+  </div>
+
+  <div class="row form-check">
+    <div class="col-12" data-api-submit="yes">
+      <input type="checkbox" class="form-check-input" id="new_prefix_detection" name="new_prefix_detection" />
+      <label for="new_prefix_detection" class="form-check-label">{% trans "New prefix detection" %}</label>
+    </div>
+  </div>
+
+
+</form>
+
+

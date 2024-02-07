@@ -1,0 +1,42 @@
+{% extends "common/v2/app/base.html" %}
+{% load static i18n %}
+{% block "title" %}fullctl / prefix{% endblock %}
+
+{% block "js" %}
+{{ block.super }}
+<script src="{% static "prefixctl/v2/prefixctl.js" %}" type="text/javascript"></script>
+<script>
+$(document).ready(() => {
+  fullctl.prefixctl.PREFIX_MONITOR_CLASSES = {{ PREFIX_MONITOR_CLASSES|safe }};
+});
+</script>
+{% endblock %}
+
+{% block "css" %}
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static "prefixctl/v2/prefixctl.css" %}" />
+{% endblock %}
+
+
+{% block "header_right" %}
+{% with app_id="prefixctl" %}
+{{ block.super }}
+{% endwith %}
+{% endblock %}
+
+{% block "app_content_toolbar_outer" %}
+<!-- prefixctl does not have an extra toolbar atm -->
+{% endblock %}
+
+{% block "app_content_menu" %}
+<div class="menu-deco-border"></div>
+{% endblock %}
+
+{% block "app_content_main" %}
+{% include "prefixctl/v2/tool/prefix_sets/main.html" %}
+{% include "prefixctl/v2/tool/asn_sets/main.html" %}
+{% endblock %}
+
+{% block "templates" %}
+{{ block.super }}
+{% endblock %}

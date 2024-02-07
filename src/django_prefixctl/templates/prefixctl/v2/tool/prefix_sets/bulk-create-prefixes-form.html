@@ -1,0 +1,25 @@
+{% load static i18n %}
+<form data-template="form_bulk_add_prefixes"
+  data-api-base="{% url "prefixctl_api:prefix_set-detail" org_tag=request.org.slug pk=0 %}"
+  data-api-action="add_prefixes"
+  data-api-method="POST"
+  >
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-12">
+        <div class="alert alert-info">
+          {% blocktrans %}
+          Add multiple prefixes at the same time. Separate prefixes with a comma, space or a new line.
+          {% endblocktrans %}
+        </div>
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col-12" data-api-submit="yes">
+        <label for="prefixes" class="form-label">{% trans "Prefixes" %}</label>
+        <textarea style="height:200px;" class="form-control" id="prefixes" name="prefixes"></textarea>
+      </div>
+    </div>
+
+  </div>
+</form>

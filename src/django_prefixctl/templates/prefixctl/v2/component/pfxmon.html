@@ -1,0 +1,113 @@
+{% load i18n static %}
+<div class="component prefix_monitor">
+  <div class="loading-shim"></div>
+  <div class="app-bar">
+    <div class="row">
+      <div class="col-sm">
+        <h5>{% trans "Prefix Monitors" %}</h5>
+      </div>
+      <div class="col-sm right">
+        <button type="button" class="btn btn-primary btn-xs btn-add">
+          <span class="icon white"><img src="{% static "common/icons/md-add.svg" }" alt="{% trans "Add Prefix Monitor" %}">Add</span></button>
+      </div>
+    </div>
+  </div>
+  <table
+    class="table table-striped table-sm"
+    data-empty-text="No Prefix Monitors set up"
+    data-sort-container="tbody"
+    data-sort-row=".listitem">
+    <thead>
+      <tr>
+        <th scope="col" class="cell-button-1"></th>
+        <th scope="col" data-sort-target=".prefix_set_name">{% trans "Prefix Set" %}</th>
+        <th scope="col" data-sort-target=".asn_set_origin_name">{% trans "Origin AS Set" %}</th>
+        <th scope="col" data-sort-target=".asn_set_upstream_name">{% trans "Upstream AS Set" %}</th>
+        <th scope="col" data-sort-target=".asn_path">{% trans "AS_PATH" %}</th>
+        <th scope="col" data-sort-target=".alerts">{% trans "Alerts" %}</th>
+        <th scope="col" data-sort-target=".roa_validation">{% trans "ROA Validation" %}</th>
+        <th scope="col" class="cell-1"></th>
+      </tr>
+    </thead>
+    <tbody class="api-list-body">
+    </tbody>
+  </table>
+
+</div>
+
+
+<table>
+  <tr class="listitem prefix_monitor">
+    <td>
+      <button type="button" class="btn btn-danger btn-xs" data-action="delete_remote">
+        <span class="icon white"><img src="{% static "common/icons/md-trash.svg" %}" alt="{% trans "Remove" %}"></span>
+      </button>
+    </td>
+    <td scope="col" class="prefix_set_name" name="prefix_set_name"></td>
+    <td scope="col" class="asn_set_origin_name" name="asn_set_origin_name"></td>
+    <td scope="col" class="asn_set_upstream_name" name="asn_set_upstream_name"></td>
+    <td scope="col" class="asn_path" name="asn_path"></td>
+    <td scope="col" class="alerts" name="alerts">
+      <div class="alert_specifics" name="alert_specifics"></div>
+      <div class="alert_dampening" name="alert_dampening"></div>
+    </td>
+    <td scope="col" class="roa_validation" name="roa_validation"></td>
+    <td class="right">
+      <button type="button" class="btn btn-primary btn-xs" data-action="edit">
+        <span class="icon white"><img src="{% static "common/icons/md-create.svg" %}" alt="{% trans "Edit" %}"></span>
+      </button>
+    </td>
+  </tr>
+</table>
+
+<form class="prefix_monitor prefix_monitor-form">
+
+  <div class="non-field-errors"></div>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-sm">
+        <div class="form-group">
+          <label for="prefix_set">{% trans "Prefix Set" %}</label>
+          <select id="prefix_set" name="prefix_set" class="form-control form-control-sm"></select>
+        </div>
+      </div>
+      <div class="col-sm">
+        <label for="asn_path">{% trans "AS_PATH" %} (RegExp)</label>
+        <input id="asn_path" name="asn_path" class="form-control form-control-sm">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm">
+        <div class="form-group">
+          <label for="asn_set_origin">{% trans "Origin AS Set" %}</label>
+          <select id="asn_set_origin" name="asn_set_origin" class="form-control form-control-sm"></select>
+        </div>
+      </div>
+      <div class="col-sm">
+        <div class="form-group">
+          <label for="asn_set_upstream">{% trans "Upstream AS Set" %}</label>
+          <select id="asn_set_upstream" name="asn_set_upstream" class="form-control form-control-sm"></select>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="alert_specifics" name="alert_specifics">
+          <label class="form-check-label" for="alert_specifics">{% trans "Alert on more specifics" %}</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="alert_dampening" name="alert_dampening">
+          <label class="form-check-label" for="alert_dampening">{% trans "Alert on dampening (stability)" %}</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="roa_validation" name="roa_validation">
+          <label class="form-check-label" for="roa_validation">{% trans "ROA validation" %}</label>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</form>
+

@@ -1,0 +1,125 @@
+{% load i18n static %}
+<div class="component asn_set">
+  <div class="loading-shim"></div>
+  <div class="app-bar">
+    <div class="row">
+      <div class="col-sm">
+        <h5>{% trans "AS Sets" %}</h5>
+      </div>
+      <div class="col-sm right">
+        <button type="button" class="btn btn-primary btn-xs btn-add">
+          <span class="icon white"><img src="{% static "common/icons/md-add.svg" }" alt="{% trans "Add AS Set" %}">Add</span></button>
+      </div>
+    </div>
+  </div>
+  <table
+    class="table table-striped table-sm"
+    data-empty-text="No AS Sets"
+    --data-sort-container="tbody"
+    --data-sort-row=".listitem">
+    <thead>
+      <tr>
+        <th scope="col" class="cell-button-1"></th>
+        <th scope="col" --data-sort-target=".name" class="cell-4">{% trans "Name" %}</th>
+        <th scope="col" --data-sort-target=".description">{% trans "Description" %}</th>
+        <th scope="col" class="cell-2"></th>
+      </tr>
+    </thead>
+    <tbody class="api-list-body">
+    </tbody>
+  </table>
+
+</div>
+
+<table>
+  <tr class="listitem asn_set">
+    <td>
+      <button type="button" class="btn btn-danger btn-xs" data-action="delete_remote">
+        <span class="icon white"><img src="{% static "common/icons/md-trash.svg" %}" alt="{% trans "Remove" %}"></span>
+      </button>
+    </td>
+    <td scope="col" class="name" name="name"></td>
+    <td scope="col" class="description" name="description"></td>
+    <td class="right">
+      <button type="button" class="btn btn-secondary btn-xs" data-action="asns">
+        <span class="icon white"><img src="{% static "common/icons/md-list-box.svg" %}" alt="{% trans "Prefixes" %}"></span>
+      </button>
+      <button type="button" class="btn btn-primary btn-xs" data-action="edit">
+        <span class="icon white"><img src="{% static "common/icons/md-create.svg" %}" alt="{% trans "Edit" %}"></span>
+      </button>
+    </td>
+  </tr>
+</table>
+
+<form class="asn_set asn_set-form">
+
+  <div class="non-field-errors"></div>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-sm">
+        <div class="form-group">
+          <label for="name">{% trans "Name" %}</label>
+          <input type="text" class="form-control" name="name" id="name">
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm">
+        <div class="form-group">
+          <label for="description">{% trans "Description" %}</label>
+          <input type="text" class="form-control" name="description" id="description">
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+<div class="asn_set asn-list">
+  <table
+    class="table table-sm table-borderless table-nested"
+    data-api-list-label="asn"
+    --data-sort-container="tbody"
+    --data-sort-row=".listitem">
+    <thead>
+      <tr class="nested">
+        <th scope="col" class="nested cell-button-1"></th>
+        <th scope="col" class="nested cell-4">{% trans "ASN" %}</th>
+        <th scope="col" class="nested">{% trans "Network Name" %}</th>
+      </tr>
+    </thead>
+    <tbody class="api-list-body">
+    </tbody>
+  </table>
+
+  <form id="asn-add" class="inline form-inline right nested">
+    <div class="form-inline-field">
+        <label>{% trans "ASN" %}</label>
+        <select name="asn"
+                id="asn"
+                data-autocomplete-light-language="en-US"
+                data-autocomplete-light-function="select2"
+                required
+                data-autocomplete-light-url="/autocomplete/pdb/asn">
+          <option value="" selected>---------</option>
+        </select>
+        <button type="button" class="btn btn-primary btn-xs btn-add attached-sm attached-select">
+          <span class="icon white"><img src="{% static "common/icons/md-add.svg" %}" alt="{% trans "Add AS" %}"></span></button>
+        </button>
+    </div>
+  </form>
+</div>
+
+<table>
+  <tr class="listitem asn-list">
+    <td scope="col">
+      <button type="button" class="btn btn-danger btn-xs" data-action="delete_remote">
+        <span class="icon white"><img src="{% static "common/icons/md-trash.svg" %}" alt="{% trans "Remove" %}"></span>
+      </button>
+    </td>
+    <td scope="col" class="asn" name="asn"></td>
+    <td scope="col" class="name" name="name"></td>
+  </tr>
+</table>
+
+

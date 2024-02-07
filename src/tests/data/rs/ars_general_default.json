@@ -1,0 +1,18 @@
+{
+    "cfg": {
+        "rs_as": 63311,
+        "router_id": "192.168.0.1",
+        "filtering": {
+            "max_as_path_len": 32,
+            "rpki_bgp_origin_validation": {
+                "enabled": false
+            }
+        },
+        "rfc1997_wellknown_communities": {
+            "policy": "pass"
+        },
+        "graceful_shutdown": {
+            "enabled": false
+        }
+    }
+}

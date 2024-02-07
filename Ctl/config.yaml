@@ -1,0 +1,72 @@
+
+ctl:
+  plugins:
+    - type: changelog
+      name: changelog
+
+    - type: version
+      name: version
+      config:
+        repository: git
+
+    - name: build
+      type: command
+      config:
+        shell: true
+        command:
+          - "docker build -t $(basename $(pwd)):$(cat Ctl/VERSION) ."
+
+    - name: deploy
+      type: command
+      config:
+        shell: true
+        command:
+          - "poetry lock"
+          - "docker build -t $(basename $(pwd)):$(cat Ctl/VERSION) ."
+          - "docker tag $(basename $(pwd)):$(cat Ctl/VERSION) $REGISTRY/fullctl/$(basename $(pwd)):$(cat Ctl/VERSION)"
+          - "docker push $REGISTRY/fullctl/$(basename $(pwd)):$(cat Ctl/VERSION)"
+
+    - name: show_version
+      type: command
+      config:
+        shell: true
+        command:
+          - "echo version $(cat Ctl/VERSION)"
+
+    - name: deploy_dev
+      type: chain
+      config:
+        chain:
+          - stage: build and deploy
+            plugin: deploy
+          - stage: complete
+            plugin: show_version
+
+  permissions:
+    - namespace: "ctl"
+      permission: "crud"
+
+  log:
+    version: 1
+    formatters:
+      simple:
+        format: '[%(asctime)s] %(message)s'
+    handlers:
+      console:
+        class: logging.StreamHandler
+        level: DEBUG
+        formatter: simple
+        stream: ext://sys.stdout
+    loggers:
+      ctl:
+        handlers: [console]
+        level: DEBUG
+        propagate: no
+      ctl.plugins.git:
+        handlers: [console]
+        level: DEBUG
+        propagate: no
+      usage:
+        handlers: [console]
+        level: INFO
+        propagate: no
