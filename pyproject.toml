@@ -7,7 +7,7 @@ authors = ["20C <code@20c.com>"]
 license = "Apache-2.0"
 
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Environment :: Console",
     "Intended Audience :: Developers",
     "Topic :: Software Development",
