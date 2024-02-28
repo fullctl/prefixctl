@@ -10,6 +10,10 @@ Please refer to [docs/quickstart.md](docs/quickstart.md)
 
 Please refer to [docs/dev/monitors.md](docs/dev/monitors.md) for the development of custom monitors.
 
+## Credit
+
+This project was initially funded by a Community Grant from the American Registery for Internet Numbers (ARIN). Read more, here: [https://www.fullctl.com/blog/ARINgrant2023](https://www.fullctl.com/blog/ARINgrant2023).
+
 ## License
 
 Copyright (c) FullCtl, LLC  
