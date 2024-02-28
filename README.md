@@ -12,8 +12,8 @@ Please refer to [docs/dev/monitors.md](docs/dev/monitors.md) for the development
 
 ## License
 
-Copyright (c) FullCtl, LLC  
-Copyright (c) 20C, LLC 
+Copyright (c) FullCtl, LLC
+Copyright (c) 20C, LLC
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this softare except in compliance with the License.
