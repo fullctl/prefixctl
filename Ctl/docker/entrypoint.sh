@@ -37,6 +37,7 @@ case "$@" in
   export DJANGO_SETTINGS_MODULE=prefixctl.settings
   export RELEASE_ENV=run_tests
   export PDBCTL_URL=test://pdbctl
+  export AAACTL_URL=test://aaactl
   cd main
   pytest tests/ -vv --cov-report=term-missing --cov-report=xml --cov=django_prefixctl --cov=prefixctl
   ;;

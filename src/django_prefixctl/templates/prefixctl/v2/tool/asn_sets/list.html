@@ -11,9 +11,7 @@
     <tr data-template="row" class="firefox-border-bugfix">
       <td data-field="name" class="highlight"></td>
       <td data-field="description"></td>
-      </td>
-      <td class="monitors">
-      </td>
+      <td class="monitors"></td>
       <td data-field="controls" class="right">
           <a class="button btn" data-hover="show" data-action="add_monitor" data-btn-type="secondary">
             <span class="icon prefixctl icon-add"></span>
@@ -22,7 +20,8 @@
           <a class="button btn" data-hover="show" data-action="edit_asn_set">
             <span class="icon prefixctl icon-edit"></span>
           </a>
-          <a class="button btn" data-hover="show"
+          <a
+            class="button btn" data-hover="show"
             data-api-action="{id}"
             data-api-callback="remove"
             data-confirm="Remove ASN set?"
@@ -43,7 +42,8 @@
 
 <div data-template="asn_monitor_list"
   data-api-action="monitors"
-  data-api-base="{% url "prefixctl_api:asn_set-detail" org_tag=request.org.slug pk=0 %}">
+  data-api-base="{% url "prefixctl_api:asn_set-detail" org_tag=request.org.slug pk=0 %}"
+>
   <div class="list-body"></div>
   <div class="list-empty">
     <div class="row property">
@@ -80,48 +80,49 @@
 </div>
 
 <table>
-<tbody>
-<tr data-template="asns_list"
-  data-api-base="{% url "prefixctl_api:asn_set-detail" org_tag=request.org.slug pk=0 %}"
-  data-api-action="asns"
-  >
-  <td colspan="5" class="inner-list-container">
-    <div>
-      <div class="grid-col-3 text-center text-uppercase">
-        <div>{% trans "ASN / Network name" %}</div>
-        <div>{% trans "ASN / Network name" %}</div>
-        <div>{% trans "ASN / Network name" %}</div>
-      </div>
+  <tbody>
+    <tr data-template="asns_list"
+      data-api-base="{% url "prefixctl_api:asn_set-detail" org_tag=request.org.slug pk=0 %}"
+      data-api-action="asns"
+      >
+      <td colspan="5" class="inner-list-container">
+        <div class="grid-col-3 text-center text-uppercase">
+          <div>{% trans "ASN / Network name" %}</div>
+          <div>{% trans "ASN / Network name" %}</div>
+          <div>{% trans "ASN / Network name" %}</div>
+        </div>
 
-    <div class="list-body grid-col-3 inner-list"></div>
-    <div class="controls">
-      <form
-        data-api-base="{% url "prefixctl_api:asn_set-detail" org_tag=request.org.slug pk=0 %}"
-        data-api-action="add_asn"
-        data-api-method="POST">
-          <div class="input-group justify-content-end mb-2 me-0" data-api-submit="yes">
-            <select name="asn" data-autocomplete-light-language="en-US" data-autocomplete-light-function="select2" id="id_asn" required data-autocomplete-light-url="/autocomplete/pdb/asn">
-            </select>
-            <button type="button" class="submit p-1 action">{% trans "Add" %}</button>
+        <div class="list-body grid-col-3 inner-list"></div>
+        <div class="controls">
+          <form
+            data-api-base="{% url "prefixctl_api:asn_set-detail" org_tag=request.org.slug pk=0 %}"
+            data-api-action="add_asn"
+            data-api-method="POST">
+              <div class="input-group justify-content-end mb-2 me-0" data-api-submit="yes">
+                {% if oauth_manages_org %}
+                <select name="asn" data-autocomplete-light-language="en-US" data-autocomplete-light-function="select2" id="id_asn" required data-autocomplete-light-url="/autocomplete/pdb/net">
+                </select>
+                {% else %}
+                <input type="text" name="asn" id="id_asn" required>
+                {% endif %}
+                <button type="button" class="submit p-1 action">{% trans "Add" %}</button>
+              </div>
+          </form>
+        </div>
+
+        <div class="templates">
+          <div data-template="row">
+            AS<span data-field="asn"></span><span> / </span><span data-field="name" class="empty-questionmark"></span>
+            <a class=""
+              data-api-action="delete_asn"
+              data-api-callback="remove"
+              data-confirm="{% trans "Remove ASN from set?" %}"
+              data-api-method="DELETE">
+              <span class="icon prefixctl icon-delete "></span>
+            </a>
           </div>
-      </form>
-    </div>
-
-    <div class="templates">
-      <div data-template="row">
-        AS<span data-field="asn"></span>
-        <span data-field="name" class="empty-questionmark"></span>
-        <a class=""
-          data-api-action="delete_asn"
-          data-api-callback="remove"
-          data-confirm="{% trans "Remove ASN from set?" %}"
-          data-api-method="DELETE">
-          <span class="icon prefixctl icon-delete "></span>
-        </a>
-      </div>
-
-    </div>
-  </td>
-</tr>
-</tbody>
+        </div>
+      </td>
+    </tr>
+  </tbody>
 </table>

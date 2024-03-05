@@ -1,6 +1,6 @@
 from fullctl.django.rest.core import BadRequest
 from fullctl.django.rest.decorators import load_object
-from fullctl.django.rest.mixins import CachedObjectMixin
+from fullctl.django.rest.mixins import CachedObjectMixin, SlugObjectMixin
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -19,7 +19,7 @@ from django_prefixctl.rest.views.monitor import (
 
 
 @route
-class PrefixSet(CachedObjectMixin, viewsets.GenericViewSet):
+class PrefixSet(CachedObjectMixin, SlugObjectMixin, viewsets.GenericViewSet):
     """
     ViewSet for handling PrefixSet operations.
 
@@ -107,7 +107,7 @@ class PrefixSet(CachedObjectMixin, viewsets.GenericViewSet):
         - args: Additional positional arguments.
         - kwargs: Additional keyword arguments.
         """
-        prefix_set = models.PrefixSet.objects.get(instance=instance, pk=pk)
+        prefix_set = self.get_object()
         serializer = self.serializer_class(prefix_set)
         return Response(serializer.data)
 
@@ -149,9 +149,7 @@ class PrefixSet(CachedObjectMixin, viewsets.GenericViewSet):
         """
         data = request.data
         data["instance"] = instance.id
-        serializer = self.serializer_class(
-            instance=models.PrefixSet.objects.get(id=pk, instance=instance), data=data
-        )
+        serializer = self.serializer_class(instance=self.get_object(), data=data)
 
         if not serializer.is_valid():
             return BadRequest(serializer.errors)
@@ -194,7 +192,7 @@ class PrefixSet(CachedObjectMixin, viewsets.GenericViewSet):
         - args: Additional positional arguments.
         - kwargs: Additional keyword arguments.
         """
-        prefix_set = models.PrefixSet.objects.get(instance=instance, pk=pk)
+        prefix_set = self.get_object()
         monitors = list_monitors(instance, prefix_set=prefix_set)
         return Response(monitors)
 
@@ -213,8 +211,8 @@ class PrefixSet(CachedObjectMixin, viewsets.GenericViewSet):
         - kwargs: Additional keyword arguments.
         """
         data = request.data
-        data["prefix_set"] = models.PrefixSet.objects.get(instance=instance, pk=pk).id
-        return add_monitor(request, data)
+        data["prefix_set"] = self.get_object().id
+        return add_monitor(request, instance, data)
 
     @action(
         detail=True,
@@ -241,7 +239,7 @@ class PrefixSet(CachedObjectMixin, viewsets.GenericViewSet):
     @action(detail=True, methods=["GET"])
     @grainy_endpoint(namespace="prefix_set.{request.org.permission_id}")
     def prefixes(self, request, org, instance, pk=None, *args, **kwargs):
-        prefix_set = models.PrefixSet.objects.get(instance=instance, pk=pk)
+        prefix_set = self.get_object()
 
         serializer = Serializers.prefix(prefix_set.prefix_set.all(), many=True)
         return Response(serializer.data)
@@ -261,7 +259,7 @@ class PrefixSet(CachedObjectMixin, viewsets.GenericViewSet):
         - kwargs: Additional keyword arguments.
         """
         data = request.data
-        data["prefix_set"] = models.PrefixSet.objects.get(instance=instance, pk=pk).id
+        data["prefix_set"] = self.get_object().id
 
         serializer = Serializers.prefix(data=data)
 
@@ -290,7 +288,7 @@ class PrefixSet(CachedObjectMixin, viewsets.GenericViewSet):
         - kwargs: Additional keyword arguments.
         """
         data = request.data
-        prefix_set = models.PrefixSet.objects.get(instance=instance, pk=pk)
+        prefix_set = self.get_object()
         prefix = models.Prefix.objects.get(prefix_set=prefix_set, pk=data.get("id"))
 
         response = Response(Serializers.prefix(prefix).data)
@@ -317,7 +315,7 @@ class PrefixSet(CachedObjectMixin, viewsets.GenericViewSet):
         """
 
         data = request.data
-        data["prefix_set"] = models.PrefixSet.objects.get(instance=instance, pk=pk).id
+        data["prefix_set"] = self.get_object().id
 
         serializer = Serializers.bulk_create_prefixes(data=data)
 
@@ -330,7 +328,7 @@ class PrefixSet(CachedObjectMixin, viewsets.GenericViewSet):
 
 
 @route
-class ASNSet(CachedObjectMixin, viewsets.GenericViewSet):
+class ASNSet(CachedObjectMixin, SlugObjectMixin, viewsets.GenericViewSet):
     """
     ViewSet for handling ASNSet operations.
 
@@ -382,6 +380,23 @@ class ASNSet(CachedObjectMixin, viewsets.GenericViewSet):
         return Response(serializer.data)
 
     @grainy_endpoint(namespace="asn_set.{request.org.permission_id}")
+    def retrieve(self, request, org, instance, pk=None, *args, **kwargs):
+        """
+        Retrieves a single ASNSet based on the primary key.
+
+        Arguments:
+        - request: The HTTP request object.
+        - org: The organization object.
+        - instance: The instance associated with the ASNSet.
+        - pk: The primary key of the ASNSet.
+        - args: Additional positional arguments.
+        - kwargs: Additional keyword arguments.
+        """
+        asn_set = self.get_object()
+        serializer = self.serializer_class(asn_set)
+        return Response(serializer.data)
+
+    @grainy_endpoint(namespace="asn_set.{request.org.permission_id}")
     def create(self, request, org, instance, *args, **kwargs):
         """
         Creates a new ASNSet with the data provided in the request.
@@ -419,9 +434,7 @@ class ASNSet(CachedObjectMixin, viewsets.GenericViewSet):
         """
         data = request.data
         data["instance"] = instance.id
-        serializer = self.serializer_class(
-            instance=models.ASNSet.objects.get(id=pk, instance=instance), data=data
-        )
+        serializer = self.serializer_class(instance=self.get_object(), data=data)
 
         if not serializer.is_valid():
             return BadRequest(serializer.errors)
@@ -463,7 +476,7 @@ class ASNSet(CachedObjectMixin, viewsets.GenericViewSet):
         - kwargs: Additional keyword arguments.
         """
 
-        asn_set = models.ASNSet.objects.get(instance=instance, pk=pk)
+        asn_set = self.get_object()
 
         serializer = Serializers.asn(asn_set.asn_set.all(), many=True)
 
@@ -485,7 +498,7 @@ class ASNSet(CachedObjectMixin, viewsets.GenericViewSet):
         """
 
         data = request.data
-        data["asn_set"] = models.ASNSet.objects.get(instance=instance, pk=pk).id
+        data["asn_set"] = self.get_object().id
 
         serializer = Serializers.asn(data=data)
 
@@ -516,7 +529,7 @@ class ASNSet(CachedObjectMixin, viewsets.GenericViewSet):
 
         data = request.data
 
-        asn_set = models.ASNSet.objects.get(instance=instance, pk=pk).id
+        asn_set = self.get_object().id
         asn = models.ASN.objects.get(asn_set=asn_set, asn=data["asn"])
 
         response_data = Serializers.asn(asn).data
@@ -542,7 +555,7 @@ class ASNSet(CachedObjectMixin, viewsets.GenericViewSet):
         - kwargs: Additional keyword arguments.
         """
 
-        asn_set = models.ASNSet.objects.get(instance=instance, pk=pk)
+        asn_set = self.get_object()
         monitors = list_monitors(instance, asn_set=asn_set)
         return Response(monitors)
 
@@ -561,8 +574,8 @@ class ASNSet(CachedObjectMixin, viewsets.GenericViewSet):
         - kwargs: Additional keyword arguments.
         """
         data = request.data
-        data["asn_set"] = models.ASNSet.objects.get(instance=instance, pk=pk).id
-        return add_monitor(request, data)
+        data["asn_set"] = self.get_object().id
+        return add_monitor(request, instance, data)
 
     @action(
         detail=True,

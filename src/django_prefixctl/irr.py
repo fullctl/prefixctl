@@ -40,10 +40,7 @@ def perform_irr_import(prefix_set: PrefixSet, as_set: str, sources=None):
     output = result.stdout.decode()
     data = json.loads(output)
 
-    old_prefixes = {
-        str(prefix.prefix): prefix.mask_length_range
-        for prefix in prefix_set.prefix_set.all()
-    }
+    old_prefixes = [prefix for prefix in prefix_set.prefix_set.all()]
 
     prefixes = {row["prefix"]: row["exact"] for row in data.get("NN")}
 
@@ -60,8 +57,8 @@ def perform_irr_import(prefix_set: PrefixSet, as_set: str, sources=None):
         elif updated:
             result["updated"].append((prefix, mask_length_range))
 
-    for prefix, _ in list(old_prefixes.items()):
-        if prefix not in prefixes:
+    for prefix in old_prefixes:
+        if prefix.prefix not in prefixes.keys():
             result["removed"].append((str(prefix.prefix), prefix.mask_length_range))
             prefix.delete()
 

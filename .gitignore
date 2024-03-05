@@ -8,3 +8,5 @@
 .log
 dev_append.py
 run_tests_append.py
+coverage.xml
+.coverage

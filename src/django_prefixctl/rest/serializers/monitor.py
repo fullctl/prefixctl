@@ -144,48 +144,6 @@ class MonitorCreationMixin:
         return super().create(validated_data, **kwargs)
 
 
-@register_prefix_monitor
-@register
-class PrefixMonitor(MonitorCreationMixin, ModelSerializer):
-    prefix_set_name = serializers.SerializerMethodField()
-    asn_set_origin_name = serializers.SerializerMethodField()
-    asn_set_upstream_name = serializers.SerializerMethodField()
-    instance = serializers.PrimaryKeyRelatedField(read_only=True)
-    monitor_type = serializers.ChoiceField(
-        choices=["prefix_monitor"], default="prefix_monitor"
-    )
-
-    class Meta:
-        model = models.PrefixMonitor
-        fields = [
-            "instance",
-            "prefix_set",
-            "prefix_set_name",
-            "asn_set_origin",
-            "asn_set_origin_name",
-            "asn_set_upstream",
-            "asn_set_upstream_name",
-            "asn_path",
-            "alert_specifics",
-            "alert_dampening",
-            "roa_validation",
-            "monitor_type",
-        ]
-
-    def get_prefix_set_name(self, obj):
-        return obj.prefix_set.name
-
-    def get_asn_set_origin_name(self, obj):
-        return obj.asn_set_origin.name
-
-    def get_asn_set_upstream_name(self, obj):
-        return obj.asn_set_upstream.name
-
-    def validate(self, data):
-        # validate_shared_instance(**data)
-        return data
-
-
 @register_asn_monitor
 @register
 class ASNMonitor(MonitorCreationMixin, ModelSerializer):
