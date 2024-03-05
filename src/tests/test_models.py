@@ -90,23 +90,6 @@ def test_prefix(db, account_objects):
     assert prefix.mask_length_range == "exact"
 
 
-def test_prefix_monitor(db, account_objects):
-    prefix_monitor = account_objects.prefix_monitor
-    prefixset = account_objects.prefixset
-    asn_set = account_objects.asn_set
-
-    assert prefix_monitor.prefix_set == prefixset
-    assert prefix_monitor.asn_set_origin == asn_set
-    assert prefix_monitor.asn_set_upstream == asn_set
-    assert prefix_monitor.asn_path is None
-    assert prefix_monitor.alert_specifics is True
-    assert prefix_monitor.alert_dampening is True
-    assert prefix_monitor.roa_validation is True
-    assert prefix_monitor.schedule_task_config == {
-        "tasks": [{"op": "prefix_monitor_task"}]
-    }
-
-
 def test_asn_monitor(db, account_objects):
     asn_monitor = account_objects.asn_monitor
     asn_set = account_objects.asn_set

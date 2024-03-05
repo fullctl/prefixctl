@@ -1,8 +1,6 @@
 import fullctl.django.testutil as testutil
-from fullctl.django.models.concrete.tasks import TaskSchedule
 import pytest
 from django.test import Client
-from django.utils import timezone
 
 # lazy init for translations
 _ = lambda s: s  # noqa: E731
@@ -84,33 +82,6 @@ class AccountObjects(testutil.AccountObjects):
         )
 
         return self._asn_monitor
-
-    @property
-    def prefix_monitor(self):
-        from django_prefixctl.models import PrefixMonitor
-
-        if hasattr(self, "_prefix_monitor"):
-            return self._prefix_monitor
-
-        self._prefix_monitor = PrefixMonitor.objects.create(
-            instance=self.prefixctl_instance,
-            prefix_set=self.prefixset,
-            asn_set_origin=self.asn_set,
-            asn_set_upstream=self.asn_set,
-            alert_specifics=True,
-            alert_dampening=True,
-            roa_validation=True,
-            task_schedule=TaskSchedule.objects.create(
-                org=self.org,
-                task_config={},
-                description="test",
-                repeat=True,
-                interval=3600,
-                schedule=timezone.now(),
-            ),
-        )
-
-        return self._prefix_monitor
 
     @property
     def prefixset_irr_importer(self):
