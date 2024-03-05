@@ -1,4 +1,5 @@
 import json
+import pytest
 from django.urls import reverse
 
 import django_prefixctl.models.prefixctl as models
@@ -194,11 +195,11 @@ def test_create_prefixset(db, account_objects):
 
 def test_delete_prefixset(db, account_objects):
     prefixset = account_objects.prefixset
-    prefix_monitor = account_objects.prefix_monitor
+    # prefix_monitor = account_objects.prefix_monitor
     client = account_objects.api_client
     org = account_objects.org
 
-    assert prefixset.prefix_monitor_set.all()[0].task_schedule
+    # assert prefixset.prefix_monitor_set.all()[0].task_schedule
 
     # Delete a prefixset
     url = reverse(
@@ -210,13 +211,16 @@ def test_delete_prefixset(db, account_objects):
 
     assert response.status_code == 200
     assert models.PrefixSet.objects.filter(id=prefixset.id).exists() is False
-    assert prefixset.prefix_monitor_set.all().count() == 0
-    assert (
-        models.TaskSchedule.objects.filter(id=prefix_monitor.task_schedule.id).exists()
-        is False
-    )
+    # assert prefixset.prefix_monitor_set.all().count() == 0
+    # assert (
+    #    models.TaskSchedule.objects.filter(id=prefix_monitor.task_schedule.id).exists()
+    #    is False
+    # )
 
 
+@pytest.mark.skip(
+    reason="No prefixctl monitor classes to test with (prefix monitor was moved to its own package)"
+)
 def test_add_monitor_to_prefixset(db, account_objects):
     prefixset = account_objects.prefixset
     client = account_objects.api_client
@@ -251,6 +255,9 @@ def test_add_monitor_to_prefixset(db, account_objects):
     assert data[0]["status"] == "ok"
 
 
+@pytest.mark.skip(
+    reason="No prefixctl monitor classes to test with (prefix monitor was moved to its own package)"
+)
 def test_list_monitors_for_prefixset(db, account_objects):
     prefixset = account_objects.prefixset
     client = account_objects.api_client
@@ -300,6 +307,9 @@ def test_list_monitors_for_prefixset(db, account_objects):
     assert data[0]["status"] == "ok"
 
 
+@pytest.mark.skip(
+    reason="No prefixctl monitor classes to test with (prefix monitor was moved to its own package)"
+)
 def test_delete_monitor_for_prefixset(db, account_objects):
     prefixset = account_objects.prefixset
     client = account_objects.api_client
