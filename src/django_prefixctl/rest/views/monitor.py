@@ -132,7 +132,6 @@ def list_monitors(instance, types: list[str] = None, **filters) -> list[dict]:
 
 @route
 class Monitor(viewsets.GenericViewSet):
-    serializer_class = Serializers.prefix_monitor
     schema = MonitorSchema()
     ref_tag = "monitor"
 

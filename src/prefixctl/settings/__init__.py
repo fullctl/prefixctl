@@ -95,6 +95,8 @@ settings_manager.set_option("IRR_IMPORT_FREQUENCY", 3600 * 12)
 
 settings_manager.set_option("GOOGLE_ANALYTICS_ID", "")
 
+settings_manager.set_option("USE_LOCAL_PERMISSIONS", False)
+
 # FINALIZE
 
 settings_manager.set_default_append()

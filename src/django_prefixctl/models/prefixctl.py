@@ -1,6 +1,5 @@
 import secrets
 
-import fullctl.django.tasks
 import fullctl.service_bridge.pdbctl as pdbctl
 import reversion
 import structlog
@@ -12,7 +11,7 @@ from fullctl.django.inet.validators import validate_masklength_range
 from fullctl.django.models.abstract.alert import AlertGroup as AlertGroupBase
 from fullctl.django.models.abstract.alert import AlertLog as AlertLogBase
 from fullctl.django.models.abstract.alert import AlertRecipient as AlertRecipientBase
-from fullctl.django.models.abstract.base import HandleRefModel
+from fullctl.django.models.abstract.base import HandleRefModel, SlugModel
 from fullctl.django.models.concrete import Instance
 from fullctl.django.models.concrete.tasks import Monitor, Task, TaskSchedule
 from fullctl.django.validators import validate_alphanumeric, validate_alphanumeric_list
@@ -26,8 +25,6 @@ __all__ = (
     "Prefix",
     "Monitor",
     "MonitorTaskMixin",
-    "PrefixMonitor",
-    "PrefixMonitorTask",
     "ASNMonitor",
     "AlertGroup",
     "AlertTask",
@@ -94,7 +91,7 @@ class TaskContainer(models.Model):
 
 @grainy_model(related="instance")
 @reversion.register
-class ASNSet(HandleRefModel):
+class ASNSet(SlugModel):
     """
     Represents a set of Autonomous System Numbers (ASN).
 
@@ -118,10 +115,13 @@ class ASNSet(HandleRefModel):
 
     class Meta:
         db_table = "prefixctl_asnset"
-        unique_together = ("instance", "name")
+        unique_together = (("instance", "name"), ("instance", "slug"))
 
     class HandleRef:
         tag = "asn_set"
+
+    def __str__(self):
+        return f"{self.instance}: {self.name} ({self.id})"
 
 
 @grainy_model(related="asn_set")
@@ -165,7 +165,7 @@ class ASN(HandleRefModel):
     namespace_instance="prefix.{instance.org.permission_id}.{instance.id}",
 )
 @reversion.register
-class PrefixSet(HandleRefModel):
+class PrefixSet(SlugModel):
     """
     Represents a set of IP network prefixes.
 
@@ -221,7 +221,7 @@ class PrefixSet(HandleRefModel):
 
     class Meta:
         db_table = "prefixctl_prefix_set"
-        unique_together = ("instance", "name")
+        unique_together = (("instance", "name"), ("instance", "slug"))
 
     class HandleRef:
         tag = "prefix_set"
@@ -437,95 +437,6 @@ class MonitorTaskMixin:
     def queue_notify_event(self, event_name):
         for alert_group in self.alert_groups:
             alert_group.start_task("notify", event_name)
-
-
-@grainy_model(
-    "prefix_monitor",
-    namespace_instance="prefix_monitor.{instance.instance.org.permission_id}.{instance.id}",
-)
-@reversion.register
-@register_prefix_monitor
-class PrefixMonitor(Monitor):
-    """
-    A monitor for tracking changes and statuses of prefixes within a set.
-
-    Attributes:
-    instance: Foreign key to an environment instance this monitor belongs to.
-    prefix_set: Foreign key to the PrefixSet being monitored.
-    asn_set_origin: Foreign key to the ASNSet that defines the origin of the monitored prefixes.
-    asn_set_upstream: Foreign key to the ASNSet that defines the upstream of the monitored prefixes.
-    asn_path: Regex field for AS_PATH matching.
-    alert_specifics: Boolean indicating if alerts should be generated for more specifics.
-    alert_dampening: Indicates if alerting on dampening is enabled.
-    roa_validation: Boolean field for enabling ROA validation.
-    task_schedule: OneToOne relationship to the task schedule for this monitor.
-    """
-
-    instance = models.ForeignKey(
-        Instance, related_name="prefix_monitor_set", on_delete=models.CASCADE
-    )
-    prefix_set = models.ForeignKey(
-        PrefixSet, related_name="prefix_monitor_set", on_delete=models.CASCADE
-    )
-    asn_set_origin = models.ForeignKey(
-        ASNSet, related_name="prefix_monitor_origin_set", on_delete=models.CASCADE
-    )
-    asn_set_upstream = models.ForeignKey(
-        ASNSet, related_name="prefix_monitor_upstream_set", on_delete=models.CASCADE
-    )
-
-    asn_path = models.CharField(
-        max_length=255, blank=True, null=True, help_text=_("AS_PATH regex field")
-    )
-    alert_specifics = models.BooleanField(help_text=_("Alert on more specifics"))
-    alert_dampening = models.BooleanField(help_text=_("Alert on dampening"))
-
-    roa_validation = models.BooleanField(help_text=_("ROA validation"))
-
-    task_schedule = models.OneToOneField(
-        TaskSchedule,
-        null=True,
-        blank=True,
-        on_delete=models.CASCADE,
-        help_text=_("The task schedule for this monitor"),
-    )
-
-    class Meta:
-        db_table = "prefixctl_prefix_monitor"
-        verbose_name = _("Prefix ASN Monitor")
-        verbose_name_plural = _("Prefix ASN Monitors")
-
-    class HandleRef:
-        tag = "prefix_monitor"
-
-    @property
-    def schedule_task_config(self):
-        """
-        Configures the scheduled task for monitoring.
-
-        Returns:
-        A dictionary containing the configuration for scheduled tasks.
-        """
-        return {"tasks": [{"op": "prefix_monitor_task"}]}
-
-
-@fullctl.django.tasks.register
-@grainy_model(related="owner")
-class PrefixMonitorTask(Task):
-    """
-    Task associated with general prefix health monitoring.
-
-    This is a proxy model inheriting from Task.
-    """
-
-    class Meta(Task.Meta):
-        proxy = True
-
-    class HandleRef:
-        tag = "prefix_monitor_task"
-
-    def run(self, *args, **kwargs):
-        raise NotImplementedError()
 
 
 @grainy_model(

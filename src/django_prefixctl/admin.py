@@ -7,8 +7,8 @@ from django_prefixctl.models import (
     AlertRecipient,
     AlertTask,
     ASNMonitor,
+    ASNSet,
     Prefix,
-    PrefixMonitor,
     PrefixSet,
     PrefixSetIRRImporter,
 )
@@ -25,17 +25,6 @@ class TaskAdmin(admin.ModelAdmin):
 
     def instance(self, obj):
         return obj.owner.instance
-
-
-@admin.register(PrefixMonitor)
-class PrefixMonitorAdmin(admin.ModelAdmin):
-    list_display = (
-        "instance",
-        "prefix_set",
-        "asn_set_origin",
-        "asn_set_upstream",
-        "created",
-    )
 
 
 class AlertRecipientInline(admin.TabularInline):
@@ -116,6 +105,8 @@ class IRRImporterInline(admin.TabularInline):
 @admin.register(PrefixSet)
 class PrefixSetAdmin(admin.ModelAdmin):
     list_display = (
+        "id",
+        "slug",
         "org",
         "instance",
         "name",
@@ -142,3 +133,21 @@ class ASNMonitorAdmin(admin.ModelAdmin):
         "instance",
         "created",
     )
+
+
+@admin.register(ASNSet)
+class ASNSetAdmin(admin.ModelAdmin):
+    list_display = (
+        "org",
+        "instance",
+        "name",
+        "created",
+    )
+    readonly_fields = ("org", "instance")
+    search_fields = ("name", "instance__org__name")
+
+    def org(self, obj):
+        return obj.instance.org
+
+    def instance(self, obj):
+        return obj.instance
