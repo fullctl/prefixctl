@@ -1,7 +1,7 @@
 from django.utils.translation import gettext_lazy as _
 from fullctl.django.rest.decorators import serializer_registry
 from fullctl.django.rest.fields import DynamicChoiceField
-from fullctl.django.rest.serializers import ModelSerializer
+from fullctl.django.rest.serializers import ModelSerializer, SlugSerializerMixin
 from fullctl.django.validators import validate_alphanumeric, validate_alphanumeric_list
 from rest_framework import serializers
 
@@ -56,8 +56,8 @@ class Prefix(ModelSerializer):
         Returns:
         The validated mask length range value. Defaults to 'exact' if input is empty.
         """
-        if val == "":
-            return "exact"
+
+        return "exact" if not val else val
 
     class Meta:
         model = models.Prefix
@@ -69,7 +69,7 @@ class Prefix(ModelSerializer):
 
 
 @register
-class PrefixSet(ModelSerializer):
+class PrefixSet(SlugSerializerMixin, ModelSerializer):
     prefixes = Prefix(source="prefix_set", many=True, read_only=True)
     monitors = serializers.SerializerMethodField()
     instance = serializers.PrimaryKeyRelatedField(read_only=True)
@@ -100,6 +100,7 @@ class PrefixSet(ModelSerializer):
         fields = [
             "instance",
             "name",
+            "slug",
             "description",
             "prefixes",
             "monitors",
@@ -213,7 +214,7 @@ class ASN(ModelSerializer):
 
 
 @register
-class ASNSet(ModelSerializer):
+class ASNSet(SlugSerializerMixin, ModelSerializer):
     asns = ASN(source="asn_set", many=True, read_only=True)
     monitors = serializers.SerializerMethodField()
     instance = serializers.PrimaryKeyRelatedField(read_only=True)
@@ -223,6 +224,7 @@ class ASNSet(ModelSerializer):
         fields = [
             "instance",
             "name",
+            "slug",
             "description",
             "asns",
             "monitors",

@@ -2,6 +2,20 @@
 
 This document describes how to implement a custom monitor for PrefixCtl, a Django-based tool for monitoring network prefixes and ASNs.
 
+# Index
+- [Overview](#overview)
+- [Module structure explained](#module-structure-explained)
+- [Step 1: Define Your Monitor Model](#step-1-define-your-monitor-model)
+- [Step 2: Implement Monitor Logic](#step-2-implement-monitor-logic)
+- [Step 3: Set Up Monitor Task](#step-3-set-up-monitor-task)
+- [Step 4: Create REST Serializer](#step-4-create-rest-serializer)
+- [Step 5: Integrate with Frontend](#step-5-integrate-with-frontend)
+- [Step 6: HTML Templates](#step-6-html-templates)
+- [Custom Django Settings](#custom-django-settings)
+- [Creating database migrations](#creating-database-migrations)
+- [Add your monitor package to INSTALLED_APPS](#add-your-monitor-package-to-installed_apps)
+- [Conclusion](#conclusion)
+
 ## Overview
 
 A monitor in PrefixCtl is a component that tracks the status of network elements based on user-defined criteria. To create a custom monitor, you need to understand the following key components:
@@ -42,12 +56,29 @@ Below is the file structure of the example monitor implementation with links to 
 
 Make sure to run migrations and register all components properly for them to be recognized by PrefixCtl.
 
+### The base is just a general django application
+
+Since this is based on Django, one can easily bootstrap the general directory structure of the monitor by running the following command:
+
+```bash
+django-admin startapp monitor_example
+```
+
+Django needs to be installed in your dev environment for this to work.
+
+To install Django, run:
+
+```bash
+pip install django
+```
+
 ## Step 1: Define Your Monitor Model
 
-Create a Django model that inherits from `Monitor` and register it with PrefixCtl. Define necessary fields and methods specific to your monitor's operation and configure its task scheduling. The following example includes class and method stubs you should implement:
+Inside `models.py` create a Django model that inherits from `Monitor` and register it with PrefixCtl. Define necessary fields and methods specific to your monitor's operation and configure its task scheduling. The following example includes class and method stubs you should implement:
 
 ```python
 from typing import Union
+from django.conf import settings
 from django.db import models
 from django_grainy.decorators import grainy_model
 from fullctl.django.models import Task, TaskSchedule, Instance
@@ -113,7 +144,7 @@ class ExampleMonitor(Monitor):
         The schedule interval for the task worker.
         For this example we are running the task worker once a day.
         """
-        return 86400
+        return settings.EXAMPLE_MONITOR_INTERVAL
 
     @property
     def schedule_task_config(self):
@@ -175,7 +206,7 @@ def example_monitor_logic(self, prefix_set:PrefixSet) -> str:
 
 ## Step 3: Set Up Monitor Task
 
-Define a task model that inherits from `Task` and register it with `@register_task`. This model represents the task worker that will execute the monitor's logic. The task should define its unique properties and methods. Begin with a class definition, unique `HandleRef` tag, and implement the `run` method where you’ll call your monitor's logic function. Here's an example structure for the task worker model:
+In `models.py` define a task model that inherits from `Task` and register it with `@register_task`. This model represents the task worker that will execute the monitor's logic. The task should define its unique properties and methods. Begin with a class definition, unique `HandleRef` tag, and implement the `run` method where you’ll call your monitor's logic function. Here's an example structure for the task worker model:
 
 ```python
 from fullctl.django.models import Task, TaskSchedule, Instance
@@ -265,7 +296,7 @@ class ExampleMonitorTask(Task):
 
 ## Step 4: Create REST Serializer
 
-Set up a serializer class for your monitor that extends from `MonitorCreationMixin` and `ModelSerializer`. This class is responsible for serialization and deserialization of monitor instances for the REST API, which allows for creation, retrieval, updating, and deletion of monitor data. You need to define the fields and methods relevant to your monitor. Include your monitor type choices and default. Here's an example serializer stub:
+In `serializers.py` set up a serializer class for your monitor that extends from `MonitorCreationMixin` and `ModelSerializer`. This class is responsible for serialization and deserialization of monitor instances for the REST API, which allows for creation, retrieval, updating, and deletion of monitor data. You need to define the fields and methods relevant to your monitor. Include your monitor type choices and default. Here's an example serializer stub:
 
 ```python
 from rest_framework import serializers
@@ -305,6 +336,19 @@ class ExampleMonitor(MonitorCreationMixin, ModelSerializer):
 ```
 
 Use the `@register` decorator to add it to the serializer registry.
+
+You will then also want to make sure the serializers module is inported via the `ready` method of your app's `apps.py` file.
+
+```python
+from django.apps import AppConfig
+
+class MonitorExampleConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'monitor_example'
+
+    def ready(self):
+        import monitor_example.serializers # noqa
+```
 
 ## Step 5: Integrate with Frontend
 
@@ -362,6 +406,133 @@ Include the necessary HTML templates and JavaScript files in the `static` and `t
 For a fully functional example, inspect the JavaScript and HTML templates provided within the `monitor_example` directory, as they contain practical implementations of a custom monitor UI. It's important to adapt these templates and script files to fit the specific logic and presentation of your monitor.
 
 Remember to manage static files according to Django's best practices, using `collectstatic` to gather them in the appropriate static file directory defined in your settings.
+
+## Step 6: HTML Templates
+
+### Form
+
+Your monitor likely needs a form for creation and editing purposes.
+
+In `templates/prefixctl/v2/tool/prefix_sets/example-monitor-form.html`, define the form fields and layout for your monitor. This form will be used to create and edit monitor instances. Here's a basic example:
+
+```html
+<form data-template="form_example_monitor"
+  data-api-base="{% url "prefixctl_api:monitor-list" org_tag=request.org.slug %}"
+  data-api-method="POST"
+  >
+
+  <!--
+    this only exists so we can display validation errors keyed
+    to the prefix set
+  -->
+  <input type="hidden" id="prefix_set" name="prefix_set" />
+
+  <!-- Add any additional form fields here -->
+
+  <div data-api-submit="yes" style="margin-top:10px">
+    <input type="hidden" name="monitor_type" value="example_monitor" />
+  </div>
+
+</form>
+```
+
+### List
+
+Next you will also want to extend PrefixCtl's list view to include a status row for your
+monitor.
+
+This row will appear once the Prefix-Set has an active monitor.
+
+In `templates/prefixctl/v2/tool/prefix_sets/list.html`, add a row for your monitor:
+
+```html
+{% extends "prefixctl/v2/tool/prefix_sets/list.html" %}
+{% load i18n fullctl_util %}
+
+{% block "prefix-set-addon-template" %}
+<!-- calling block super is important, so all the other monitors and addons keep their status rows -->
+{{ block.super }}
+
+<!-- set the data-template value to `monlist_{your monitor tag id}` -->
+<div class="row property" data-template="monlist_example_monitor">
+  <div class="col field">
+    {% trans "Example Monitor" %}: <span class="highlight" data-field="status"></span>
+  </div>
+  <!-- Add additional status labels / buttons etc. here -->
+  <div class="col field">
+  </div>
+  <div class="col-1 field-empty right">
+     <a data-action="edit_prefix_monitor"><span class="icon prefixctl icon-edit"></span></a>
+     <a data-api-action="delete_monitor"
+        data-api-callback="remove"
+        data-confirm="Remove monitor?"
+        data-api-method="DELETE"><span class="icon prefixctl icon-delete"></span></a>
+  </div>
+</div>
+{% endblock %}
+```
+
+### Main
+
+Finally we need to make sure the new form template is imported into the main prefix-set view.
+
+In `templates/prefixctl/v2/tool/prefix_sets/main.html`, include the form template:
+
+```html
+{% extends "prefixctl/v2/tool/prefix_sets/main.html" %}
+{% load i18n %}
+{% block "prefix-set-templates" %}
+  {{ block.super }}
+  {% include "prefixctl/v2/tool/prefix_sets/example-monitor-form.html" %}
+{% endblock %}
+```
+
+## Custom Django Settings
+
+If your monitor needs to define custom django settings you can create a `settings.py` file in your monitor app and then import it in your `apps.py` `ready` method.
+
+`settings.py`
+```python
+from django.conf import settings
+from fullctl.django.settings import SettingsManager
+
+settings_manager = SettingsManager(settings.__dict__)
+
+# interval (seconds, 86400 = 1 day)
+settings_manager.set_option("EXAMPLE_MONITOR_INTERVAL", 86400)
+```
+
+`apps.py`
+```python
+class MonitorExampleConfig(AppConfig):
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "monitor_example"
+
+    def ready(self):
+        import monitor_example.settings  # noqa
+```
+
+## Creating database migrations
+
+```sh
+Ctl/dev/run.sh makemigrations monitor_example
+```
+
+## Add your monitor package to INSTALLED_APPS
+
+Once your monitor package is ready and exists as a python module in your environment you need to add to the INSTALLED_APPS list in your Django settings file. You do this by creating a new file called {RELEASE_ENV}_append.py inside **PrefixCtl's** src/prefixctl/settings/ and adding the following lines to it:
+
+Where `{RELEASE_ENV}` is the environment you are deploying to, for example `dev` or `prod`.
+
+`src/prefixctl/settings/dev_append.py`
+```python
+prefixctl_app_index = INSTALLED_APPS.index(
+    "django_prefixctl.apps.DjangoPrefixctlConfig"
+)
+
+# Add the example_monitor app to the INSTALLED_APPS list, right before the prefixctl app
+INSTALLED_APPS.insert(prefixctl_app_index, "monitor_example")
+```
 
 ## Conclusion
 

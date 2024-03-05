@@ -18,6 +18,8 @@ $ctl.application.Prefixctl = $tc.extend(
       });
       this.$t.asn_sets.activate();
       $($ctl.application).trigger("prefixctl-ready", [this]);
+
+      this.autoload_page();
     }
   },
   $ctl.application.Application
@@ -107,9 +109,9 @@ $ctl.application.Prefixctl.PrefixMonitorList = $tc.extend(
 
       if(monitor_type != "prefix_monitor") {
         console.log("monitor type not supported: "+monitor_type)
-        var node = $ctl.template("monlist_"+monitor_type)
+        const node = $ctl.template("monlist_"+monitor_type);
         if(!node.length)
-          return;
+          return $('<div>');
         return node;
       }
 
@@ -631,7 +633,7 @@ $ctl.application.Prefixctl.ModalSelectPrefixMonitor = $tc.extend(
 
       // only one monitor is available to the user
       if (monitor_classes.length == 1) {
-        monitor_classes[0].modal(prefix_set);
+        $ctl.application.Prefixctl.PrefixSetMonitors.monitors[monitor_classes[0]].modal(prefix_set);
         return;
       }
 
@@ -773,76 +775,6 @@ $ctl.application.Prefixctl.ModalMonitorBase = $tc.extend(
   $ctl.application.Modal
 )
 
-
-
-$ctl.application.Prefixctl.ModalPrefixMonitor = $tc.extend(
-  "ModalPrefixMonitor",
-  {
-    ModalPrefixMonitor : function(prefix_set, prefix_monitor) {
-      var form = this.form = new twentyc.rest.Form(
-        $ctl.template("form_prefix_monitor")
-      );
-
-      var modal = this;
-      var title = prefix_set.name + ": Add Monitor"
-
-      if(prefix_monitor) {
-        form.fill(prefix_monitor)
-        form.form_action = prefix_monitor.id
-        form.method = "PUT";
-        title = prefix_set.name + ": Edit Monitor"
-      }
-
-      $(this.form).on(
-        "api-write:before",
-        function(event, endpoint, payload, method) {
-          payload.prefix_set = prefix_set.id;
-        }
-      );
-
-      $(this.form).on(
-        "api-write:success",
-        function(event, endpoint, payload, response) {
-          var row = $ctl.prefixctl.$t.prefix_sets.$w.list.find_row(
-            prefix_set.id
-          );
-          row.filter('tr.secondary').show();
-          row.data("monlist").load();
-          modal.hide();
-        }
-      );
-
-      this.select_asn_set_origin = new twentyc.rest.Select(
-        this.form.element.find('#asn_set_origin')
-      );
-      this.select_asn_set_origin.load();
-
-      this.select_asn_set_upstream = new twentyc.rest.Select(
-        this.form.element.find('#asn_set_upstream')
-      );
-      this.select_asn_set_upstream.load();
-
-
-      this.Modal("save", title, form.element);
-      form.wire_submit(this.$e.button_submit);
-    }
-  },
-  $ctl.application.Modal
-)
-
-// register the prefix asn monitor
-$ctl.application.Prefixctl.PrefixSetMonitors.register(
-  {
-    name: "prefix_monitor",
-    permissions: ["asn_set", "prefix_monitor"],
-    label: "Prefix Monitor",
-    modal: function (prefix_set, monitor) {
-      return new $ctl.application.Prefixctl.ModalPrefixMonitor(prefix_set, monitor);
-    }
-  }
-);
-
-
 $ctl.application.Prefixctl.ASNSets = $tc.extend(
   "ASNSets",
   {
@@ -959,7 +891,7 @@ $ctl.application.Prefixctl.ASNSets = $tc.extend(
       list.element.insertAfter(row);
       list.load();
 
-      const form = new twentyc.rest.Form(
+      const form = new $ctl.application.Prefixctl.ASNtoASNSetForm(
         list.element.find('.controls > form')
       )
       form.base_url = form.base_url.replace("/0", "/"+asn_set.id);
@@ -1006,6 +938,26 @@ $ctl.application.Prefixctl.ASNSets = $tc.extend(
     }
   },
   $ctl.application.Tool
+);
+
+$ctl.application.Prefixctl.ASNtoASNSetForm = $tc.extend(
+  "ASNtoASNSetForm",
+  {
+    ASNtoASNSetForm : function(jq) {
+      this.Form(jq);
+    },
+
+    render_non_field_errors : function(errors) {
+      const index = errors.indexOf("The fields asn_set, asn must make a unique set.");
+      if (index > -1) {
+        errors.splice(index, 1);
+        errors.push("This ASN already exists in the set.");
+      }
+
+      return this.Form_render_non_field_errors(errors);
+    },
+  },
+  twentyc.rest.Form
 );
 
 

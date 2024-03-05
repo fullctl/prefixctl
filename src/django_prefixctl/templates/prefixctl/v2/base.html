@@ -17,6 +17,26 @@ $(document).ready(() => {
 <link rel="stylesheet" type="text/css" href="{% static "prefixctl/v2/prefixctl.css" %}" />
 {% endblock %}
 
+{% block "header_middle" %}
+<div class="app-pages-nav | nav h-100" data-component="pages">
+  <a class="nav-link active"
+    id="tab-prefix-sets"
+    data-bs-toggle="tab"
+    role="tab"
+    aria-controls="prefix-sets"
+    aria-selected="true"
+    href="#prefix-sets">{% trans "Prefix Sets" %}</a>
+
+  <a class="nav-link"
+    id="tab-asn-sets"
+    data-bs-toggle="tab"
+    role="tab"
+    aria-controls="asn-sets"
+    data-grainy-remove="asn_set.{{ request.org.permission_id }}"
+    href="#asn-sets">{% trans "ASN Sets" %}</a>
+</div>
+{% endblock %}
+
 
 {% block "header_right" %}
 {% with app_id="prefixctl" %}
@@ -33,8 +53,15 @@ $(document).ready(() => {
 {% endblock %}
 
 {% block "app_content_main" %}
-{% include "prefixctl/v2/tool/prefix_sets/main.html" %}
-{% include "prefixctl/v2/tool/asn_sets/main.html" %}
+<div class="tab-content mt-5" id="app-pages">
+  <div class="tab-pane show active" id="prefix-sets" role="tabpanel" aria-labelledby="tab-prefix-sets">
+    {% include "prefixctl/v2/tool/prefix_sets/main.html" %}
+  </div>
+
+  <div class="tab-pane" id="asn-sets" role="tabpanel" aria-labelledby="tab-asn-sets">
+    {% include "prefixctl/v2/tool/asn_sets/main.html" %}
+  </div>
+</div>
 {% endblock %}
 
 {% block "templates" %}
