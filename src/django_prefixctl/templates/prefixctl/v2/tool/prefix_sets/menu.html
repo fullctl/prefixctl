@@ -16,10 +16,21 @@
     </div>
     <div class="row">
       <div class="col-md-4">
-        <div class="toolbar-control input-group searchbar prefix-searchbar" data-api-search="{% url "prefixctl_api:prefix_set-search-prefix" org_tag=request.org.slug %}">
-          <input type="text" value="" data-role="filter" placeholder="Search for Prefix">
+        <div class="toolbar-control input-group searchbar prefix-searchbar" data-api-prefix-search="{% url "prefixctl_api:prefix_set-search-prefix" org_tag=request.org.slug %}" data-api-prefixset-search="{% url "prefixctl_api:prefix_set-search-prefixset" org_tag=request.org.slug %}">
+          <input type="text" value="" data-role="filter" placeholder="Search for Prefix / Prefix Set name">
           <button class="btn curved" data-role="filter_submit" type="button"><span class="icon icon-search"></span></button>
           <button class="btn secondary small" data-role="filter_clear" type="button" style="display: none;"><span class="icon icon-cancel"></span></button>
+        </div>
+      </div>
+    </div>
+    <div class="row center justify-content-center" data-element="filter_notice" style="display: none;">
+      <div class="col-8 mt-3">
+        <div class="row alert alert-info mb-0 p-2 center">
+          <p class="p-0 m-0">
+            {% trans "Some Prefixes/Prefix Sets might be hidden due to search, please " %}
+            <a data-element="clear_filter" class="|">{% trans "clear" %}</a>
+            {% trans " to see all." %}
+          </p>
         </div>
       </div>
     </div>

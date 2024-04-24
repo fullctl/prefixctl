@@ -77,6 +77,28 @@ class PrefixSet(CachedObjectMixin, SlugObjectMixin, viewsets.GenericViewSet):
         serializer = Serializers.prefix(prefixes, many=True)
         return Response(serializer.data)
 
+    @action(
+        detail=False,
+        methods=["GET"],
+    )
+    @grainy_endpoint(namespace="prefix_set.{request.org.permission_id}")
+    def search_prefixset(self, request, org, instance, *args, **kwargs):
+        """
+        Searches for a prefixset based on the provided query parameter.
+
+        Arguments:
+        - request: The HTTP request object, containing the query parameter 'q'.
+        - org: The organization object.
+        - instance: The instance associated with the PrefixSet.
+        - args: Additional positional arguments.
+        - kwargs: Additional keyword arguments.
+        """
+        search_term = request.query_params.get("q", "")
+        prefixsets = instance.prefix_set_set.filter(name__icontains=search_term)
+
+        serializer = Serializers.prefix_set(prefixsets, many=True)
+        return Response(serializer.data)
+
     @grainy_endpoint(namespace="prefix_set.{request.org.permission_id}")
     def list(self, request, org, instance, *args, **kwargs):
         """
