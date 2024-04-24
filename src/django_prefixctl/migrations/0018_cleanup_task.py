@@ -7,7 +7,14 @@ def delete_prefix_monitor_tasks(apps, schema_editor):
     TaskSchedule = apps.get_model('django_fullctl', 'TaskSchedule')
 
     Task.handleref.filter(op="prefix_monitor_task").delete()
-    TaskSchedule.handleref.filter(task_config__op="prefix_monitor_task").delete()
+
+    for ts in TaskSchedule.handleref.all():
+        if "tasks" in ts.task_config:
+            for task in ts.task_config["tasks"]:
+                if task.get("op") == "prefix_monitor_task":
+                    ts.delete()
+                    break
+
 
 class Migration(migrations.Migration):
 
@@ -16,5 +23,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(delete_prefix_monitor_tasks),
+        migrations.RunPython(delete_prefix_monitor_tasks, migrations.RunPython.noop),
     ]
