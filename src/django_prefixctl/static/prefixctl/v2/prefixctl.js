@@ -151,9 +151,13 @@ $ctl.application.Prefixctl.PrefixSets = $tc.extend(
     },
 
     init : function() {
+      const prefix_search_url = this.jquery.find(".prefix-searchbar").data("api-prefix-search");
+      const prefixset_search_url = this.jquery.find(".prefix-searchbar").data("api-prefixset-search");
       this.widget("list", ($e) => {
-        return new twentyc.rest.List(
-          this.template("list", this.$e.body)
+        return new $ctl.application.Prefixctl.PrefixSetList(
+          this.template("list", this.$e.body),
+          prefix_search_url,
+          prefixset_search_url
         );
       })
 
@@ -283,7 +287,7 @@ $ctl.application.Prefixctl.PrefixSets = $tc.extend(
     },
 
     prefixes_expanded : function(prefix_set) {
-      return this.elements.body.find('#prefixes-'+prefix_set.id).length > 0
+      return this.$w.list.prefixes_expanded(prefix_set);
     },
 
     toggle_prefixes : function(prefix_set, row) {
@@ -359,12 +363,81 @@ $ctl.application.Prefixctl.PrefixSets = $tc.extend(
      */
 
     expand_prefixes : function(prefix_set, prefix_set_row) {
+      return this.$w.list.expand_prefixes(prefix_set, prefix_set_row);
+    },
+
+    collapse_prefixes : function(prefix_set) {
+      return this.$w.list.collapse_prefixes(prefix_set);
+    },
+
+    menu : function() {
+      let menu = this.Tool_menu();
+      menu.find('[data-element="button_add_prefix_set"]').click(() => {
+        this.prompt_add_prefix_set();
+      });
+
+
+      const searchbar = new fullctl.application.Searchbar(
+        menu.find(".prefix-searchbar"),
+        this.$w.list.filter.bind(this.$w.list),
+        this.$w.list.clear_filter.bind(this.$w.list)
+      );
+
+      menu.find('[data-element="clear_filter"]').click(() => {
+        searchbar.clear_search();
+      });
+
+      return menu;
+    },
+
+    // v2 - add bottom menu
+    bottom_menu: function() {
+      let bottom_menu = this.Tool_bottom_menu();
+      bottom_menu.find('[data-element="button_api_view"]').attr(
+        "href", this.$w.list.base_url + "/?pretty"
+      )
+
+      return bottom_menu;
+    },
+
+    activate : function() {
+      this.$w.list.load();
+      return this.Tool_activate();
+    }
+  },
+  $ctl.application.Tool
+);
+
+$ctl.application.Prefixctl.PrefixSetList = $tc.extend(
+  "PrefixSetList",
+  {
+    PrefixSetList: function(jq, prefix_search_url, prefixset_search_url) {
+      this.List(jq);
+
+      this.prefix_search_url = prefix_search_url;
+      this.prefixset_search_url = prefixset_search_url;
+    },
+
+    prefixes_expanded : function(prefix_set) {
+      return this.list_body.find('#prefixes-'+prefix_set.id).length > 0
+    },
+
+    /**
+     * expands the prefix list for the prefix set
+     *
+     * will do nothing if list is already expanded
+     *
+     * @method expand_prefixes
+     * @return {Promise} promise that resolves when the list is loaded
+     */
+
+    expand_prefixes : function(prefix_set, prefix_set_row) {
       if(this.prefixes_expanded(prefix_set)) {
         return Promise.resolve();
       }
 
       if(!prefix_set_row) {
-        var prefix_set_row = this.$w.list.find_row(prefix_set.id);
+        var prefix_set_row = this.find_row(prefix_set.id);
       }
 
       if(prefix_set_row.length > 0)
@@ -372,8 +445,8 @@ $ctl.application.Prefixctl.PrefixSets = $tc.extend(
 
       prefix_row.find('a[data-action="list_prefixes"] .icon').removeClass('icon-caret-left').addClass('icon-caret-down');
 
-      var list = new twentyc.rest.List(
-        this.template('prefixes_list')
+      const list = new twentyc.rest.List(
+        $ctl.prefixctl.$t.prefix_sets.template('prefixes_list')
       );
 
       prefix_set_row.data("prefix-list", list);
@@ -418,133 +491,203 @@ $ctl.application.Prefixctl.PrefixSets = $tc.extend(
     },
 
     collapse_prefixes : function(prefix_set) {
-      var row = this.$w.list.find_row(prefix_set.id);
+      const row = this.find_row(prefix_set.id);
       row.find('a[data-action="list_prefixes"] .icon').removeClass('icon-caret-down').addClass('icon-caret-left');
-      var node = this.elements.body.find('#prefixes-'+prefix_set.id)
+
+      const node = this.list_body.find('#prefixes-'+prefix_set.id)
       node.detach()
     },
 
-    menu : function() {
-      let menu = this.Tool_menu();
-      menu.find('[data-element="button_add_prefix_set"]').click(() => {
-        this.prompt_add_prefix_set();
-      });
+    filter : function(search_term) {
+      this.loading_shim.show();
+      this.prefix_filter(search_term).then((result) => {
+        const first_prefix_element = result.first_prefix_element;
 
-      // prefix filter functionality
-      const tool = this;
-      const prefix_search_url = menu.find(".prefix-searchbar").data("api-search");
-
-      /**
-       * hides prefixes in the UI based on whether they match the `search_term` parameter
-       * and scrolls to the first match of the `search_term`
-       *
-       * @function prefix_filter
-       * @param {String} search_term
-       */
-      const prefix_filter = (search_term) => {
-        $.ajax({
-          method : "GET",
-          url : `${prefix_search_url}?q=${search_term}`,
-        }).done((result) => {
-          const matches = {}
-          for (const match of result.data) {
-            if (!matches[match.prefix_set]) {
-              matches[match.prefix_set] = []
-            }
-            matches[match.prefix_set].push(match)
+        const except_prefixsets = result.response.map((item) => item.prefix_set);
+        this.prefixset_filter(search_term, except_prefixsets).then((result) => {
+          if(first_prefix_element) {
+            first_prefix_element.scrollIntoView();
           }
 
-          const prefix_expand_promises = [];
-          const matched_elements = [];
-          this.$w.list.list_body.find(".secondary.prelist").each(function() {
-            const prefix_set = $(this).data('apiobject');
+          this.loading_shim.hide();
 
-            if(prefix_set.id in matches) {
-              const promise = tool.expand_prefixes(prefix_set, $(this)).then(() => {
-                $(this).attr("data-filter", 'expanded');
+          // if result is empty
+          if(result.length == 0 && !first_prefix_element) {
+            alert("No results found")
+          } else {
+            $ctl.prefixctl.$t.prefix_sets.$e.menu.find('[data-element="filter_notice"]').show();
+          }
+        });
+      });
+    },
 
-                const prefixes = $(this).data("prefix-list").list_body.find(".prefix-container");
-                prefixes.each(function() {
-                  const title = $(this).find('.prefix').text().toLowerCase();
-                  if (title.startsWith(search_term)) {
-                    matched_elements.push($(this));
-                    $(this).show()
-                  } else {
-                    $(this).hide();
-                  }
-                });
+    clear_filter: function() {
+      this.clear_prefix_filter();
+      this.clear_prefixset_filter();
+      $ctl.prefixctl.$t.prefix_sets.$e.menu.find('[data-element="filter_notice"]').hide();
+    },
 
+    /**
+     * hides prefixes in the UI based on whether they match the `search_term` parameter
+     * and scrolls to the first match of the `search_term`
+     *
+     * @method prefix_filter
+     * @param {String} search_term
+     * @returns {Promise} promise that resolves when the prefixes are filtered
+     */
+
+    prefix_filter: function(search_term) {
+      return $.ajax({
+        method : "GET",
+        url : `${this.prefix_search_url}?q=${search_term}`,
+      }).then((result) => {
+        const matches = {}
+        for (const match of result.data) {
+          if (!matches[match.prefix_set]) {
+            matches[match.prefix_set] = []
+          }
+          matches[match.prefix_set].push(match)
+        }
+
+        const list = this;
+        const prefix_expand_promises = [];
+        const matched_elements = [];
+        this.list_body.find(".secondary.prelist").each(function() {
+          const prefix_set = $(this).data('apiobject');
+
+          if(prefix_set.id in matches) {
+            const promise = list.expand_prefixes(prefix_set, $(this)).then(() => {
+              $(this).attr("data-filter", 'expanded');
+
+              const prefixes = $(this).data("prefix-list").list_body.find(".prefix-container");
+              prefixes.each(function() {
+                const title = $(this).find('.prefix').text().toLowerCase();
+                if (title.startsWith(search_term)) {
+                  matched_elements.push($(this));
+                  $(this).show()
+                } else {
+                  $(this).hide();
+                }
               });
 
-              prefix_expand_promises.push(promise);
-            } else {
-              if(tool.prefixes_expanded(prefix_set)) {
-                $(this).data("prefix-list").list_body.find(".prefix-container").hide();
-              }
-            }
-          });
-
-          // scroll first match into view
-          Promise.all(prefix_expand_promises).then(() => {
-            // to get first element in DOM
-            let jq_obj = $();
-            matched_elements.forEach((element) => {
-              jq_obj = jq_obj.add(element);
             });
 
-            const first_prefix_element = jq_obj.eq(0)[0]
-            if(first_prefix_element) {
-              first_prefix_element.scrollIntoView();
-            } else {
-              alert("No matches found");
-            }
-
-          });
-
-        });
-      };
-
-      /**
-       * unhides all hidden prefixes in the UI, returns prefix sets to collapsed state
-       * if they were expanded because of the `prefix_filter` function.
-       *
-       * @function clear_prefix_filter
-       */
-      const clear_prefix_filter = () => {
-        this.$w.list.list_body.find(".secondary.prelist").each(function() {
-          if ($(this).data("prefix-list")) {
-            $(this).data("prefix-list").list_body.find(".prefix-container").show();
-
-            const prefixset_apiobj = $(this).data('apiobject')
-            if($(this).attr("data-filter") == "expanded") {
-              $(this).removeAttr("data-filter");
-              tool.collapse_prefixes(prefixset_apiobj);
+            prefix_expand_promises.push(promise);
+          } else {
+            if(list.prefixes_expanded(prefix_set)) {
+              $(this).data("prefix-list").list_body.find(".prefix-container").hide();
             }
           }
-        })
-      };
+        });
 
-      new fullctl.application.Searchbar(menu.find(".prefix-searchbar"), prefix_filter, clear_prefix_filter);
+        // scroll first match into view
+        return Promise.all(prefix_expand_promises).then(() => {
+          // to get first element in DOM
+          let jq_obj = $();
+          matched_elements.forEach((element) => {
+            jq_obj = jq_obj.add(element);
+          });
 
-      return menu;
+          const first_prefix_element = jq_obj.eq(0)[0]
+
+          return {
+            "response" : result.data,
+            "first_prefix_element": first_prefix_element
+          };
+        });
+      })
     },
 
-    // v2 - add bottom menu
-    bottom_menu: function() {
-      let bottom_menu = this.Tool_bottom_menu();
-      bottom_menu.find('[data-element="button_api_view"]').attr(
-        "href", this.$w.list.base_url + "/?pretty"
-      )
+    /**
+     * unhides all hidden prefixes in the UI, returns prefix sets to collapsed state
+     * if they were expanded because of the `prefix_filter` function.
+     *
+     * @function clear_prefix_filter
+     */
+    clear_prefix_filter : function() {
+      const list = this;
+      this.list_body.find(".secondary.prelist").each(function() {
+        if ($(this).data("prefix-list")) {
+          $(this).data("prefix-list").list_body.find(".prefix-container").show();
 
-      return bottom_menu;
+          const prefixset_apiobj = $(this).data('apiobject')
+          if($(this).attr("data-filter") == "expanded") {
+            $(this).removeAttr("data-filter");
+            list.collapse_prefixes(prefixset_apiobj);
+          }
+        }
+      })
     },
 
-    activate : function() {
-      this.$w.list.load();
-      return this.Tool_activate();
-    }
+    /**
+     * hides prefixes in the UI based on whether they match the `search_term` parameter
+     * and doesn't hide any prefixes that are in the `excempt_prefixsets_ids` array
+     *
+     * @method prefixset_filter
+     * @param {String} search_term
+     * @param {Array} excempt_prefixsets_ids
+     * @returns {Promise} promise that resolves when the prefixes are filtered
+     */
+    prefixset_filter: function(search_term, excempt_prefixsets_ids = []) {
+      return $.ajax({
+        method : "GET",
+        url : `${this.prefixset_search_url}?q=${search_term}`,
+      }).then((result) => {
+        if (result.data.length == 0) return []
+
+        const row_ids = this.get_row_ids();
+        // remove excempted prefixsets from the search results
+        for (const prefix of excempt_prefixsets_ids) {
+          if (row_ids.has(prefix)) {
+            row_ids.delete(prefix);
+          }
+        }
+
+        row_ids.forEach((id) => {
+          this.hide_prefixset(id);
+        });
+
+        result.data.forEach((prefix_set) => {
+          this.show_prefixset(prefix_set.id);
+        });
+
+        return result.data;
+      });
+    },
+
+    clear_prefixset_filter: function() {
+      const row_ids = this.get_row_ids();
+      row_ids.forEach((id) => {
+        this.show_prefixset(id);
+      });
+    },
+
+    hide_prefixset: function(id) {
+      const row = this.find_row(id);
+      row.hide();
+      this.list_body.find("#prefixes-"+id).hide();
+    },
+
+    show_prefixset: function(id) {
+      const row = this.find_row(id);
+      row.show();
+      this.list_body.find("#prefixes-"+id).show();
+      this.list_body.find("#prefixes-"+id).find('.prefix-container').show();
+    },
+
+    get_row_ids: function() {
+      const row_ids = new Set();
+      this.list_body.find("tr").each(function() {
+        const prefix_set = $(this).data('apiobject');
+        if (prefix_set) {
+          row_ids.add(prefix_set.id);
+        }
+      });
+
+      return row_ids;
+    },
   },
-  $ctl.application.Tool
+  twentyc.rest.List
 );
 
 $ctl.application.Prefixctl.ModalPrefixSet = $tc.extend(

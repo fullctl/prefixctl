@@ -30,7 +30,8 @@ tr.prelist {
   display: inline-block;
 }
 
-.prefix-container .dropdown-toggle {
+.prefix-container .dropdown-toggle,
+.prefix-container button {
   background-color: transparent;
   border: 1px solid transparent;
   border-radius: 4px;
