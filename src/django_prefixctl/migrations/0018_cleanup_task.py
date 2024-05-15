@@ -2,9 +2,10 @@
 
 from django.db import migrations
 
+
 def delete_prefix_monitor_tasks(apps, schema_editor):
-    Task = apps.get_model('django_fullctl', 'Task')
-    TaskSchedule = apps.get_model('django_fullctl', 'TaskSchedule')
+    Task = apps.get_model("django_fullctl", "Task")
+    TaskSchedule = apps.get_model("django_fullctl", "TaskSchedule")
 
     Task.handleref.filter(op="prefix_monitor_task").delete()
 
@@ -17,7 +18,6 @@ def delete_prefix_monitor_tasks(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("django_prefixctl", "0017_remove_prefixmonitor_asn_set_origin_and_more"),
     ]
