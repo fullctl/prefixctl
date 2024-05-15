@@ -320,6 +320,31 @@ class PrefixSet(CachedObjectMixin, SlugObjectMixin, viewsets.GenericViewSet):
         return response
 
     @action(
+        detail=True,
+        methods=["POST"],
+    )
+    @grainy_endpoint(namespace="prefix_set.{request.org.permission_id}")
+    def delete_prefixes(self, request, org, instance, *args, **kwargs):
+        """
+        Delete all prefixes for the given instance after given days.
+
+        Arguments:
+        - request: The HTTP request object.
+        - org: The organization object.
+        - instance: The instance associated with the PrefixSet.
+        - args: Additional positional arguments.
+        - kwargs: Additional keyword arguments.
+        """
+        data = request.data
+        instance_prefix_sets = instance.prefix_set_set.prefetch_related(
+            "prefix_set"
+        ).all()
+        for prefix_set in instance_prefix_sets:
+            prefix_set.delete_prefixes_after_x_days(data["days"])
+
+        return Response({"success": True})
+
+    @action(
         detail=True, methods=["POST"], serializer_class=Serializers.bulk_create_prefixes
     )
     @grainy_endpoint(namespace="prefix_set.{request.org.permission_id}")

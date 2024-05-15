@@ -1,10 +1,12 @@
 import secrets
+from datetime import timedelta
 
 import fullctl.service_bridge.pdbctl as pdbctl
 import reversion
 import structlog
 from django.conf import settings
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django_grainy.decorators import grainy_model
 from fullctl.django.inet.validators import validate_masklength_range
@@ -316,6 +318,13 @@ class PrefixSet(SlugModel):
             created = True
 
         return created, updated
+
+    def delete_prefixes_after_x_days(self, days_old):
+        """Delete prefixes older than a certain number of days."""
+        cutoff_date = timezone.now() - timedelta(days=days_old)
+        old_prefixes = self.prefix_set.filter(created__lt=cutoff_date)
+        if old_prefixes.count() > 0:
+            old_prefixes.delete()
 
 
 class PrefixSetIRRImporter(Monitor):
