@@ -25,6 +25,31 @@ $ctl.application.Prefixctl = $tc.extend(
   $ctl.application.Application
 );
 
+$ctl.application.Prefixctl.load_list_from_local_data = function(_list, _data) {
+
+  /*
+  * we send prefixes and monitors with each prefix set already
+  * we can just read them from the data object and insert them into the list
+  * without having to request them from their respective
+  * endpoints.
+  * 
+  * This cuts down requests on page load significantly as number
+  * of prefix-sets goes
+  * up
+  * 
+  * TODO: should probably a utility function in twentyc.rest
+  */
+
+  _list.list_body.empty()
+
+  for(let idx in _data) {
+    _list.insert(_data[idx])
+  }
+  $(_list).trigger("load:after", twentyc.rest.Response(
+    JSON.stringify({data:_data}), 200
+  ));
+}
+
 /**
  * Monitor registry
  * @class Monitors
@@ -230,15 +255,15 @@ $ctl.application.Prefixctl.PrefixSets = $tc.extend(
           } else {
             monlist.element.find('div.list-empty').show();
           }
-        });
-
-        monlist.load().then(() => {
           monlist.element.appendTo(row.filter('tr.monlist').children('td'));
         });
+        
+        $ctl.application.Prefixctl.load_list_from_local_data(monlist, data.monitors)
+
         row.data("monlist", monlist);
 
         if(data.ux_keep_list_open) {
-          this.expand_prefixes(data, row);
+          this.expand_prefixes(data, row, true);
         }
 
 
@@ -362,8 +387,8 @@ $ctl.application.Prefixctl.PrefixSets = $tc.extend(
      * @return {Promise} promise that resolves when the list is loaded
      */
 
-    expand_prefixes : function(prefix_set, prefix_set_row) {
-      return this.$w.list.expand_prefixes(prefix_set, prefix_set_row);
+    expand_prefixes : function(prefix_set, prefix_set_row, use_cached) {
+      return this.$w.list.expand_prefixes(prefix_set, prefix_set_row, use_cached);
     },
 
     collapse_prefixes : function(prefix_set) {
@@ -431,7 +456,7 @@ $ctl.application.Prefixctl.PrefixSetList = $tc.extend(
      * @return {Promise} promise that resolves when the list is loaded
      */
 
-    expand_prefixes : function(prefix_set, prefix_set_row) {
+    expand_prefixes : function(prefix_set, prefix_set_row, use_cached) {
       if(this.prefixes_expanded(prefix_set)) {
         return Promise.resolve();
       }
@@ -487,7 +512,14 @@ $ctl.application.Prefixctl.PrefixSetList = $tc.extend(
       });
       list.element.attr('id', 'prefixes-'+prefix_set.id);
 
-      return list.load();
+      // console.trace("use_cached", use_cached)
+
+      if(use_cached) {
+        $ctl.application.Prefixctl.load_list_from_local_data(list, prefix_set.prefixes)
+      } else {
+        return list.load();
+      }
+
     },
 
     collapse_prefixes : function(prefix_set) {
@@ -974,9 +1006,12 @@ $ctl.application.Prefixctl.ASNSets = $tc.extend(
           }
         });
 
-        monlist.load().then(() => {
+        $(monlist).on('load:after', () => {
           monlist.element.appendTo(row.children('td.monitors').last());
         });
+
+        $ctl.application.Prefixctl.load_list_from_local_data(monlist, data.monitors)
+
         row.data("monlist", monlist);
       });
 
