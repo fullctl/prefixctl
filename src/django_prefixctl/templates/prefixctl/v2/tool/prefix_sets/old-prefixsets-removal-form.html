@@ -1,0 +1,15 @@
+{% load static i18n %}
+<form data-template="form_old_prefixsets_removal"
+  data-api-base="{% url "prefixctl_api:prefix_set-detail" org_tag=request.org.slug pk=0 %}"
+  data-api-action="delete_prefixes"
+  data-api-method="POST"
+  >
+  <div class="container-fluid">
+    <div class="row mb-3">
+      <div class="col-12" data-api-submit="yes">
+        <label for="days">Remove prefixes older than <input type="text" id="days" name="days" placeholder="Enter number of days"> days</label>
+        <input type="checkbox" id="prefix-removal-toggle" name="prefix-removal-toggle">
+      </div>
+    </div>
+  </div>
+</form>
