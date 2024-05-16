@@ -265,6 +265,10 @@ $ctl.application.Prefixctl.PrefixSets = $tc.extend(
       return new $ctl.application.Prefixctl.ModalPrefixSet();
     },
 
+    prompt_remove_prefix_sets : function() {
+      return new $ctl.application.Prefixctl.RemovePrefixSets();
+    },
+
     prompt_edit_prefix_set : function(prefix_set) {
       return new $ctl.application.Prefixctl.ModalPrefixSet(prefix_set);
     },
@@ -374,6 +378,10 @@ $ctl.application.Prefixctl.PrefixSets = $tc.extend(
       let menu = this.Tool_menu();
       menu.find('[data-element="button_add_prefix_set"]').click(() => {
         this.prompt_add_prefix_set();
+      });
+
+      menu.find('[data-element="button_schedule_remove_prefix_sets"]').click(() => {
+        this.prompt_remove_prefix_sets();
       });
 
 
@@ -689,6 +697,38 @@ $ctl.application.Prefixctl.PrefixSetList = $tc.extend(
   },
   twentyc.rest.List
 );
+
+
+$ctl.application.Prefixctl.RemovePrefixSets = $tc.extend(
+  "RemovePrefixSets",
+  {
+    RemovePrefixSets : function() {
+      var form = this.form = new twentyc.rest.Form(
+        $ctl.template("form_old_prefixsets_removal")
+      );
+      var modal = this;
+      var title = "Remove Prefix Sets"
+
+
+      $(this.form).on(
+        "api-write:success",
+        function(event, endpoint, payload, response) {
+          var data = response.first()
+          var list = $ctl.prefixctl.$t.prefix_sets.$w.list;
+          list.load().then(() => {
+            if(!data.irr_import) {
+              $ctl.prefixctl.$t.prefix_sets.expand_prefixes(data)
+            }
+          });
+          modal.hide();
+        }
+      );
+      this.Modal("save_right", title, form.element);
+      form.wire_submit(this.$e.button_submit);
+    }
+  },
+  $ctl.application.Modal
+)
 
 $ctl.application.Prefixctl.ModalPrefixSet = $tc.extend(
   "ModalPrefixSet",
