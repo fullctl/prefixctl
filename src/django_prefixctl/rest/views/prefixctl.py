@@ -1,9 +1,13 @@
+from datetime import timedelta
+
+import reversion
 from fullctl.django.rest.core import BadRequest
 from fullctl.django.rest.decorators import load_object
 from fullctl.django.rest.mixins import CachedObjectMixin, SlugObjectMixin
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from django.utils import timezone
 
 import django_prefixctl.models as models
 from django_prefixctl.rest.api_schema import ASNSetSchema, PrefixSetSchema
@@ -319,6 +323,7 @@ class PrefixSet(CachedObjectMixin, SlugObjectMixin, viewsets.GenericViewSet):
 
         return response
 
+    
     @action(
         detail=True,
         methods=["POST"],
@@ -336,11 +341,13 @@ class PrefixSet(CachedObjectMixin, SlugObjectMixin, viewsets.GenericViewSet):
         - kwargs: Additional keyword arguments.
         """
         data = request.data
-        instance_prefix_sets = instance.prefix_set_set.prefetch_related(
-            "prefix_set"
-        ).all()
-        for prefix_set in instance_prefix_sets:
-            prefix_set.delete_prefixes_after_x_days(data["days"])
+        cutoff_date = timezone.now() - timedelta(days=data["days"])
+        instance_prefix_sets = instance.prefix_set_set.filter(created__lt=cutoff_date)
+        with reversion.create_revision():
+            for prefix_set in instance_prefix_sets:
+                reversion.set_user(request.user)
+                reversion.set_comment(f"{request.user} deleted prefix set {prefix_set.id}")
+                prefix_set.delete()
 
         return Response({"success": True})
 

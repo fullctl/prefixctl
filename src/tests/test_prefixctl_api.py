@@ -451,14 +451,12 @@ def test_delete_prefix_from_prefixset(db, account_objects):
     assert response.status_code == 200
     assert prefixset.prefix_set.all().count() == 0
 
-
 def test_delete_prefixes_after_x_days(db, account_objects):
     prefixset = account_objects.prefixset
-    account_objects.prefix()
     client = account_objects.api_client
     org = account_objects.org
 
-    assert prefixset.prefix_set.all().count() == 1
+    assert prefixset.all().count() == 1
 
     data = {"days": 0}
     response = client.post(
@@ -471,7 +469,7 @@ def test_delete_prefixes_after_x_days(db, account_objects):
     )
 
     assert response.status_code == 200
-    assert prefixset.prefix_set.all().count() == 0
+    assert prefixset.all().count() == 0
 
 
 def test_asnset_list(db, account_objects):
