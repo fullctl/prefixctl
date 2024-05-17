@@ -698,7 +698,9 @@ $ctl.application.Prefixctl.PrefixSetList = $tc.extend(
   twentyc.rest.List
 );
 
-
+/**
+ * Modal for removing prefix sets that are older than the specified number of days
+*/
 $ctl.application.Prefixctl.RemovePrefixSets = $tc.extend(
   "RemovePrefixSets",
   {

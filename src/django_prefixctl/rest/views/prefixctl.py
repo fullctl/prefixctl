@@ -1,12 +1,12 @@
 from datetime import timedelta
 
-import reversion
 from fullctl.django.rest.core import BadRequest
 from fullctl.django.rest.decorators import load_object
 from fullctl.django.rest.mixins import CachedObjectMixin, SlugObjectMixin
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework import status
 from django.utils import timezone
 
 import django_prefixctl.models as models
@@ -14,7 +14,10 @@ from django_prefixctl.rest.api_schema import ASNSetSchema, PrefixSetSchema
 from django_prefixctl.rest.decorators import grainy_endpoint
 from django_prefixctl.rest.route.prefixctl import route
 from django_prefixctl.rest.serializers.monitor import Serializers as MonitorSerializers
-from django_prefixctl.rest.serializers.prefixctl import Serializers
+from django_prefixctl.rest.serializers.prefixctl import (
+    Serializers,
+    DeletePrefixesSerializer,
+)
 from django_prefixctl.rest.views.monitor import (
     add_monitor,
     list_monitors,
@@ -323,7 +326,6 @@ class PrefixSet(CachedObjectMixin, SlugObjectMixin, viewsets.GenericViewSet):
 
         return response
 
-    
     @action(
         detail=True,
         methods=["POST"],
@@ -340,16 +342,20 @@ class PrefixSet(CachedObjectMixin, SlugObjectMixin, viewsets.GenericViewSet):
         - args: Additional positional arguments.
         - kwargs: Additional keyword arguments.
         """
-        data = request.data
-        cutoff_date = timezone.now() - timedelta(days=data["days"])
-        instance_prefix_sets = instance.prefix_set_set.filter(created__lt=cutoff_date)
-        with reversion.create_revision():
+        serializer = DeletePrefixesSerializer(data=request.data)
+        if serializer.is_valid():
+            days = serializer.validated_data["days"]
+            cutoff_date = timezone.now() - timedelta(days=days)
+            instance_prefix_sets = instance.prefix_set_set.filter(
+                created__lt=cutoff_date
+            )
+
             for prefix_set in instance_prefix_sets:
-                reversion.set_user(request.user)
-                reversion.set_comment(f"{request.user} deleted prefix set {prefix_set.id}")
                 prefix_set.delete()
 
-        return Response({"success": True})
+            return Response({"success": True})
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(
         detail=True, methods=["POST"], serializer_class=Serializers.bulk_create_prefixes
