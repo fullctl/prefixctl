@@ -763,6 +763,9 @@ $ctl.application.Prefixctl.AddPrefixForm = $tc.extend(
   twentyc.rest.Form
 );
 
+/**
+ * Modal for removing prefix sets that are older than the specified number of days
+*/
 $ctl.application.Prefixctl.RemovePrefixSets = $tc.extend(
   "RemovePrefixSets",
   {
