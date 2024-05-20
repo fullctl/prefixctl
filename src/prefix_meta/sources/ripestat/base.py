@@ -40,7 +40,8 @@ class RipestatRequest(prefix_meta.Request):
         proxy = True
 
     class Config(prefix_meta.Request.Config):
-        max_prefixlen_4 = 15
+        # any reason to allow less specific than /10?
+        max_prefixlen_4 = 10
         max_prefixlen_6 = 64
         min_prefixlen_4 = 32
         min_predixlen_6 = 128

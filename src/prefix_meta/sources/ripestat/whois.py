@@ -42,7 +42,14 @@ class HistoricalWhois(RipestatRequest):
         for ref in data.get("referencing", []):
             references[ref[0]["key"]] = ref[0]["type"]
 
-        for obj in data.get("objects", []):
+        objects = data.get("objects", [])
+        is_suggestions = False
+        if not objects:
+            # no objects, check if there are suggestions
+            objects = data.get("suggestions", [])
+            is_suggestions = True
+
+        for obj in objects:
             normalized[obj["key"]] = _obj = {
                 "version": obj["version"],
                 "type": obj["type"],
@@ -57,6 +64,17 @@ class HistoricalWhois(RipestatRequest):
                     _obj[name] = attrib["value"]
 
                 if attrib["attribute"] in ["admin-c", "tech-c", "abuse-c"]:
-                    _obj[f"{name}_type"] = references[attrib["value"]]
+                    try:
+                        _obj[f"{name}_type"] = references[attrib["value"]]
+                    except KeyError:
+                        pass
+
+        if is_suggestions:
+            # for suggestions we only keep the ones where source is RIPE
+            # with the idea being that even though its a suggestion
+            # RIPEStat has some confidence in it (may need further tweaking)
+            normalized = {
+                k: v for k, v in normalized.items() if v.get("source") == "RIPE"
+            }
 
         return normalized
