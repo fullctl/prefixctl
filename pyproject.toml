@@ -26,6 +26,11 @@ prefixctl = "prefixctl.cli:main"
 [tool.poetry.dependencies]
 python = "^3.9"
 fullctl = { git = "https://github.com/fullctl/fullctl.git", branch = "prep-release" }
+pygments = "^2.14"
+rdap = "^1.5"
+xmltodict = "^0.13.0"
+structlog = ">=23.1.0"
+pydantic = ">=2.6.3"
 
 [tool.poetry.dev-dependencies]
 # testing

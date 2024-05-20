@@ -1,0 +1,55 @@
+{% extends "prefixctl/v2/tool/prefix_sets/list.html" %}
+{% load i18n fullctl_util %}
+
+{% block "prefix-set-addon-template" %}
+{{ block.super }}
+<table
+  class="table"
+  data-api-base="{% url "prefixctl_api:meta-all-by-type" org_tag=request.org.slug typ="location" ip="__ip__" mask="__masklen__" %}"
+  data-template="location_report_list">
+  <thead>
+    <tr>
+      <th scope="col">{% trans "Prefix" %}</th>
+      <th scope="col">{% trans "Country" %}</th>
+      <th scope="col">{% trans "Region" %}</th>
+      <th scope="col">{% trans "City" %}</th>
+      <th scope="col">{% trans "Geolocation" %}</th>
+      <th scope="col">{% trans "ISP" %}</th>
+    </tr>
+  </thead>
+  <tbody class="list-body"></tbody>
+  <tbody class="list-no-data">
+    <tr>
+      <td colspan="6">Fetching locations, this may take a minute if this the first time locations for this prefix have been requested.</td>
+    </tr>
+  </tbody>
+  <tbody class="list-footer">
+    <tr>
+      <td colspan="6">
+        <a href="{% url "prefix-meta:location-export" org_tag=request.org.slug ip="__ip__" masklen="__masklen__" %}" class="button prefixctl" data-element="button_export">
+          <span class="icon prefixctl icon-download"></span>
+          <span class="label prefixctl">{% trans "Export CSV" %}</span>
+        </a>
+      </td>
+    </tr>
+  </tbody>
+  <tbody class="templates">
+    <tr data-template="row">
+      <td data-field="prefix" class="highlight"></td>
+      <td data-field="country_code" ></td>
+      <td data-field="region" ></td>
+      <td data-field="city" ></td>
+      <td data-field="geo"></td>
+      <td data-field="isp"></td>
+    </tr>
+    <tr data-template="row" class="detail-row">
+      <td colspan="6" data-field="data">
+
+      </td>
+    </tr>
+
+  </tbody>
+</table>
+
+
+{% endblock %}

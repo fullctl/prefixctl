@@ -1,5 +1,6 @@
 Unreleased:
   added:
+  - `prefixctl-meta` is now included in the core prefixctl package
   - Standalone auth support using django-admin
   - "tests (84% coverage)"
   - "`PrefixSet` `slug` field"

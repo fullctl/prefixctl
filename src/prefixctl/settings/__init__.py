@@ -38,6 +38,7 @@ INSTALLED_APPS += (
     "reversion",
     "netfields",
     "fullctl.django.apps.DjangoFullctlConfig",
+    "prefix_meta",
     "django_prefixctl.apps.DjangoPrefixctlConfig",
 )
 
