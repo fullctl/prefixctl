@@ -1,5 +1,5 @@
 import json
-from datetime import timezone
+from datetime import timezone, timedelta
 import pytest
 from django.urls import reverse
 
@@ -462,17 +462,18 @@ def test_delete_prefixes_after_x_days(db, account_objects):
     prefixset_2 = models.PrefixSet.objects.create(
         instance=instance,
         name="Test Prefixeset 2",
-        created=timezone.now(),
         description="Test Prefixes",
     )
+    prefixset_2.created = timezone.now() - timedelta(days=2)
+    prefixset_2.save()
 
     assert prefixset.all().count() == 2
 
-    data = {"days": 0}
+    data = {"days": 1}
     response = client.post(
         reverse(
             "prefixctl_api:prefix_set-delete-prefixes",
-            kwargs={"org_tag": org.slug, "pk": prefixset.id},
+            kwargs={"org_tag": org.slug},
         ),
         json.dumps(data),
         content_type="application/json",
@@ -480,7 +481,7 @@ def test_delete_prefixes_after_x_days(db, account_objects):
 
     assert response.status_code == 200
     assert prefixset.all().count() == 1
-    assert prefixset.all().first().id == prefixset_2.id
+    assert prefixset.all().first().id == prefixset.id
 
 
 def test_asnset_list(db, account_objects):

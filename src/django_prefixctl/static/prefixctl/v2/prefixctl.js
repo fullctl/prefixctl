@@ -711,17 +711,9 @@ $ctl.application.Prefixctl.RemovePrefixSets = $tc.extend(
       var modal = this;
       var title = "Remove Prefix Sets"
 
-
       $(this.form).on(
         "api-write:success",
         function(event, endpoint, payload, response) {
-          var data = response.first()
-          var list = $ctl.prefixctl.$t.prefix_sets.$w.list;
-          list.load().then(() => {
-            if(!data.irr_import) {
-              $ctl.prefixctl.$t.prefix_sets.expand_prefixes(data)
-            }
-          });
           modal.hide();
         }
       );

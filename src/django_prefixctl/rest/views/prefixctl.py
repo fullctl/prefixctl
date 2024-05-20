@@ -14,10 +14,7 @@ from django_prefixctl.rest.api_schema import ASNSetSchema, PrefixSetSchema
 from django_prefixctl.rest.decorators import grainy_endpoint
 from django_prefixctl.rest.route.prefixctl import route
 from django_prefixctl.rest.serializers.monitor import Serializers as MonitorSerializers
-from django_prefixctl.rest.serializers.prefixctl import (
-    Serializers,
-    DeletePrefixesSerializer,
-)
+from django_prefixctl.rest.serializers.prefixctl import Serializers, DeletePrefixesSerializer
 from django_prefixctl.rest.views.monitor import (
     add_monitor,
     list_monitors,
@@ -326,8 +323,9 @@ class PrefixSet(CachedObjectMixin, SlugObjectMixin, viewsets.GenericViewSet):
 
         return response
 
+    
     @action(
-        detail=True,
+        detail=False,
         methods=["POST"],
     )
     @grainy_endpoint(namespace="prefix_set.{request.org.permission_id}")
@@ -344,11 +342,9 @@ class PrefixSet(CachedObjectMixin, SlugObjectMixin, viewsets.GenericViewSet):
         """
         serializer = DeletePrefixesSerializer(data=request.data)
         if serializer.is_valid():
-            days = serializer.validated_data["days"]
+            days = serializer.validated_data['days']
             cutoff_date = timezone.now() - timedelta(days=days)
-            instance_prefix_sets = instance.prefix_set_set.filter(
-                created__lt=cutoff_date
-            )
+            instance_prefix_sets = instance.prefix_set_set.filter(created__lt=cutoff_date)
 
             for prefix_set in instance_prefix_sets:
                 prefix_set.delete()
@@ -356,6 +352,7 @@ class PrefixSet(CachedObjectMixin, SlugObjectMixin, viewsets.GenericViewSet):
             return Response({"success": True})
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
     @action(
         detail=True, methods=["POST"], serializer_class=Serializers.bulk_create_prefixes
