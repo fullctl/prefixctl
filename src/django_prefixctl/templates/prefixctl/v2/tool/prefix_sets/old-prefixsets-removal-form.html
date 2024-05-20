@@ -1,7 +1,6 @@
 {% load static i18n %}
 <form data-template="form_old_prefixsets_removal"
-  data-api-base="{% url "prefixctl_api:prefix_set-detail" org_tag=request.org.slug pk=0 %}"
-  data-api-action="delete_prefixes"
+  data-api-base="{% url "prefixctl_api:prefix_set-delete-prefixes" org_tag=request.org.slug %}"
   data-api-method="POST"
   >
   <div class="container-fluid">
