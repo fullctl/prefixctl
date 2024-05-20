@@ -454,7 +454,7 @@ def test_delete_prefix_from_prefixset(db, account_objects):
     assert response.status_code == 200
     assert prefixset.prefix_set.all().count() == 0
 
-def test_delete_prefixes_after_x_days(db, account_objects):
+def test_delete_prefixsets_after_x_days(db, account_objects):
     prefixset = account_objects.prefixset
     instance = account_objects.prefixctl_instance
     client = account_objects.api_client
@@ -462,7 +462,7 @@ def test_delete_prefixes_after_x_days(db, account_objects):
 
     prefixset_2 = models.PrefixSet.objects.create(
         instance=instance,
-        name="Test Prefixeset 2",
+        name="Test PrefixSet 2",
         description="Test Prefixes",
     )
     prefixset_2.created = timezone.now() - timedelta(days=2)
@@ -473,7 +473,7 @@ def test_delete_prefixes_after_x_days(db, account_objects):
     data = {"days": 1}
     response = client.post(
         reverse(
-            "prefixctl_api:prefix_set-delete-prefixes",
+            "prefixctl_api:prefix_set-delete-prefixsets",
             kwargs={"org_tag": org.slug},
         ),
         json.dumps(data),

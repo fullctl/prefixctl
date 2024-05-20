@@ -1,13 +1,16 @@
 from datetime import timedelta
+from typing import Any, Tuple, Dict
 
 from fullctl.django.rest.core import BadRequest
 from fullctl.django.rest.decorators import load_object
 from fullctl.django.rest.mixins import CachedObjectMixin, SlugObjectMixin
+from fullctl.django.models import Instance, Organization
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
 from django.utils import timezone
+from django.http import HttpRequest
 
 import django_prefixctl.models as models
 from django_prefixctl.rest.api_schema import ASNSetSchema, PrefixSetSchema
@@ -329,7 +332,7 @@ class PrefixSet(CachedObjectMixin, SlugObjectMixin, viewsets.GenericViewSet):
         methods=["POST"],
     )
     @grainy_endpoint(namespace="prefix_set.{request.org.permission_id}")
-    def delete_prefixes(self, request, org, instance, *args, **kwargs):
+    def delete_prefixsets(self, request: HttpRequest, org: Organization, instance: Instance, *args: Tuple[Any, ...], **kwargs: Dict[str, Any]) -> Response:
         """
         Delete all prefixSets older than the given days.
 
@@ -344,9 +347,9 @@ class PrefixSet(CachedObjectMixin, SlugObjectMixin, viewsets.GenericViewSet):
         if serializer.is_valid():
             days = serializer.validated_data['days']
             cutoff_date = timezone.now() - timedelta(days=days)
-            instance_prefix_sets = instance.prefix_set_set.filter(created__lt=cutoff_date)
+            org_prefix_sets = instance.prefix_set_set.filter(created__lt=cutoff_date)
 
-            for prefix_set in instance_prefix_sets:
+            for prefix_set in org_prefix_sets:
                 prefix_set.delete()
 
             return Response({"success": True})
