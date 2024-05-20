@@ -305,7 +305,7 @@ class AlertRecipient(ModelSerializer):
         ]
 
 
-class DeletePrefixesSerializer(serializers.Serializer):
+class DeletePrefixSetsSerializer(serializers.Serializer):
     days = serializers.IntegerField(min_value=0, required=True)
 
     class Meta:
