@@ -493,7 +493,7 @@ $ctl.application.Prefixctl.PrefixSetList = $tc.extend(
         list.element.find('.irr-import-hide').show();
       }
 
-      var form = new twentyc.rest.Form(
+      const form = new $ctl.application.Prefixctl.AddPrefixForm(
         list.element.find('.controls > form')
       )
       form.base_url = form.base_url.replace("/0", "/"+prefix_set.id);
@@ -720,6 +720,27 @@ $ctl.application.Prefixctl.PrefixSetList = $tc.extend(
     },
   },
   twentyc.rest.List
+);
+
+$ctl.application.Prefixctl.AddPrefixForm = $tc.extend(
+  "AddPrefixForm",
+  {
+    AddPrefixForm : function(jq) {
+      this.Form(jq);
+    },
+
+    render_non_field_errors : function(errors) {
+      errors = errors.map((error) => {
+        if (error.startsWith('null value in column "prefix" violates not-null constraint')) {
+          return "Enter prefix into Prefix field before clicking Add.";
+        }
+        return error;
+      });
+
+      return this.Form_render_non_field_errors(errors);
+    },
+  },
+  twentyc.rest.Form
 );
 
 $ctl.application.Prefixctl.ModalPrefixSet = $tc.extend(
