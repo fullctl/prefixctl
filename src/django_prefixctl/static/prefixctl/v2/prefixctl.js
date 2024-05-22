@@ -194,6 +194,16 @@ $ctl.application.Prefixctl.PrefixSets = $tc.extend(
           this.toggle_prefixes(row.data("apiobject"), row)
         });
 
+        const name_field = row.find('td[data-field="name"]')
+        const prefixsetDate = new Date(data.created);
+        const currentDate = new Date();
+        const timeDifference = currentDate - prefixsetDate;
+
+        const millisecondsInADay = 1000 * 60 * 60 * 24;
+        const daysDifference = Math.floor(timeDifference / millisecondsInADay);
+        const dayText = daysDifference === 1 ? 'day' : 'days';
+        name_field.html(name_field.html() + `<span style="font-weight: normal;font-size: 15px">(${daysDifference} ${dayText} old)</span>`)
+
         const add_monitor_button = row.find('a[data-action="add_monitor"]');
         if (this.is_user_add_monitor_allowed()) {
           add_monitor_button.click(() => {
@@ -774,7 +784,20 @@ $ctl.application.Prefixctl.RemovePrefixSets = $tc.extend(
         $ctl.template("form_old_prefixsets_removal")
       );
       var modal = this;
-      var title = "Remove Prefix Sets"
+      var title = "Remove Prefix Sets Older than"
+
+      $(this.form).on(
+        "api-write:before",
+        function(event, endpoint, payload, response) {
+          const confimation = confirm(`Remove PrefixSets older than ${payload.days} old?`);
+          if (!confimation) {
+            console.log("Form submission prevente")
+            event.preventDefault();
+            event.stopImmediatePropagation(); 
+            return false;
+          }
+        }
+      )
 
       $(this.form).on(
         "api-write:success",
