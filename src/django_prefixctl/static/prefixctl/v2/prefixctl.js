@@ -790,6 +790,7 @@ $ctl.application.Prefixctl.RemovePrefixSets = $tc.extend(
         const confirmation = confirm(`Remove PrefixSets older than ${method.days} years old?`);
         if (!confirmation) {
           method.days = ""
+          modal.hide()
           return false;
         }
       });
