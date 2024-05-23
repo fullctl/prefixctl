@@ -787,7 +787,7 @@ $ctl.application.Prefixctl.RemovePrefixSets = $tc.extend(
       var title = "Remove Prefix Sets Older than"
 
       $(this.form).on("api-request:before", function(endpoint, data, method) {
-        const confirmation = confirm(`Remove PrefixSets older ${method.days} than old?`);
+        const confirmation = confirm(`Remove PrefixSets older than ${method.days} years old?`);
         if (!confirmation) {
           method.days = ""
           return false;
