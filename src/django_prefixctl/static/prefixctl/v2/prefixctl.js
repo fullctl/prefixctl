@@ -786,18 +786,13 @@ $ctl.application.Prefixctl.RemovePrefixSets = $tc.extend(
       var modal = this;
       var title = "Remove Prefix Sets Older than"
 
-      $(this.form).on(
-        "api-write:before",
-        function(event, endpoint, payload, response) {
-          const confimation = confirm(`Remove PrefixSets older than ${payload.days} old?`);
-          if (!confimation) {
-            console.log("Form submission prevente")
-            event.preventDefault();
-            event.stopImmediatePropagation(); 
-            return false;
-          }
+      $(this.form).on("api-request:before", function(endpoint, data, method) {
+        const confirmation = confirm(`Remove PrefixSets older ${method.days} than old?`);
+        if (!confirmation) {
+          method.days = ""
+          return false;
         }
-      )
+      });
 
       $(this.form).on(
         "api-write:success",
@@ -809,6 +804,7 @@ $ctl.application.Prefixctl.RemovePrefixSets = $tc.extend(
       );
       this.Modal("save_right", title, form.element);
       form.wire_submit(this.$e.button_submit);
+
     }
   },
   $ctl.application.Modal
