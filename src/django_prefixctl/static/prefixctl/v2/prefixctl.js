@@ -773,27 +773,38 @@ $ctl.application.Prefixctl.AddPrefixForm = $tc.extend(
   twentyc.rest.Form
 );
 
+  
+$ctl.application.Prefixctl.PrefixSetRemovalWidget = $tc.extend(
+  "PrefixSetRemovalWidget",
+  {
+    PrefixSetRemovalWidget : function(jq) {
+      this.Form(jq);
+    },
+
+    submit: function(method) {
+      const confirmation = confirm(`Remove PrefixSets older ${this.payload().days} than old?`);
+      if (!confirmation) {
+        return false;
+      }
+
+      this.Form_submit(method)
+    },
+  },
+  twentyc.rest.Form
+);
+
 /**
  * Modal for removing prefix sets that are older than the specified number of days
 */
 $ctl.application.Prefixctl.RemovePrefixSets = $tc.extend(
   "RemovePrefixSets",
   {
-    RemovePrefixSets : function() {
-      var form = this.form = new twentyc.rest.Form(
+    RemovePrefixSets : function(jq) {
+      var form = this.form = new $ctl.application.Prefixctl.PrefixSetRemovalWidget(
         $ctl.template("form_old_prefixsets_removal")
       );
       var modal = this;
-      var title = "Remove Prefix Sets Older than"
-
-      $(this.form).on("api-request:before", function(endpoint, data, method) {
-        const confirmation = confirm(`Remove PrefixSets older than ${method.days} years old?`);
-        if (!confirmation) {
-          method.days = ""
-          modal.hide()
-          return false;
-        }
-      });
+      var title = "Remove Prefix Sets"
 
       $(this.form).on(
         "api-write:success",
@@ -806,7 +817,7 @@ $ctl.application.Prefixctl.RemovePrefixSets = $tc.extend(
       this.Modal("save_right", title, form.element);
       form.wire_submit(this.$e.button_submit);
 
-    }
+    },
   },
   $ctl.application.Modal
 )
