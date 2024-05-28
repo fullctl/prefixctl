@@ -32,11 +32,11 @@ $ctl.application.Prefixctl.load_list_from_local_data = function(_list, _data) {
   * we can just read them from the data object and insert them into the list
   * without having to request them from their respective
   * endpoints.
-  * 
+  *
   * This cuts down requests on page load significantly as number
   * of prefix-sets goes
   * up
-  * 
+  *
   * TODO: should probably a utility function in twentyc.rest
   */
 
@@ -257,7 +257,7 @@ $ctl.application.Prefixctl.PrefixSets = $tc.extend(
           }
           monlist.element.appendTo(row.filter('tr.monlist').children('td'));
         });
-        
+
         $ctl.application.Prefixctl.load_list_from_local_data(monlist, data.monitors)
 
         row.data("monlist", monlist);
@@ -722,6 +722,12 @@ $ctl.application.Prefixctl.PrefixSetList = $tc.extend(
   twentyc.rest.List
 );
 
+
+/**
+ * Form to add prefix
+ * @class AddPrefixForm
+ */
+
 $ctl.application.Prefixctl.AddPrefixForm = $tc.extend(
   "AddPrefixForm",
   {
@@ -729,6 +735,12 @@ $ctl.application.Prefixctl.AddPrefixForm = $tc.extend(
       this.Form(jq);
     },
 
+    /**
+     * overridden to show more user friendly error messages
+     *
+     * @method render_non_field_errors
+     * @param {Array} errors
+     */
     render_non_field_errors : function(errors) {
       errors = errors.map((error) => {
         if (error.startsWith('null value in column "prefix" violates not-null constraint')) {
