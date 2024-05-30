@@ -201,6 +201,7 @@ $ctl.application.Prefixctl.PrefixSets = $tc.extend(
 
         const millisecondsInADay = 1000 * 60 * 60 * 24;
         const daysDifference = Math.floor(timeDifference / millisecondsInADay);
+        localStorage.setItem("PrefixSet-" + data.name, daysDifference);
         const dayText = daysDifference === 1 ? 'day' : 'days';
         name_field.html(name_field.html() + `<span style="font-weight: normal;font-size: 15px">(${daysDifference} ${dayText} old)</span>`)
 
@@ -773,6 +774,12 @@ $ctl.application.Prefixctl.AddPrefixForm = $tc.extend(
   twentyc.rest.Form
 );
 
+function removePrefix(str, prefix) {
+  if (str.startsWith(prefix)) {
+      return str.substring(prefix.length);
+  }
+  return str;
+}
   
 $ctl.application.Prefixctl.PrefixSetRemovalWidget = $tc.extend(
   "PrefixSetRemovalWidget",
@@ -782,7 +789,21 @@ $ctl.application.Prefixctl.PrefixSetRemovalWidget = $tc.extend(
     },
 
     submit: function(method) {
-      const confirmation = confirm(`Remove PrefixSets older ${this.payload().days} than old?`);
+      const prefix_sets = []
+      for (let i=0;i<localStorage.length;i++){
+        const key = localStorage.key(i);
+        if (key.startsWith("PrefixSet")){
+          const value = localStorage.getItem(key);
+          if (value >= this.payload().days){
+            let result = removePrefix(key, "PrefixSet-");
+            prefix_sets.push(result)
+          }
+        }
+
+      }
+      const confirmation = confirm(
+        `Remove PrefixSets older ${this.payload().days} than old?\n${prefix_sets}`
+      );
       if (!confirmation) {
         return false;
       }

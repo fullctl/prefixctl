@@ -164,7 +164,7 @@ class ASN(HandleRefModel):
     namespace="prefix",
     namespace_instance="prefix.{instance.org.permission_id}.{instance.id}",
 )
-@reversion.register
+@reversion.register(follow=['prefix_set'])
 class PrefixSet(SlugModel):
     """
     Represents a set of IP network prefixes.
@@ -386,7 +386,7 @@ class PrefixSetIRRImporter(Monitor):
     namespace="prefix",
     namespace_instance="prefix.{instance.prefix_set.org.permission_id}.{instance.prefix_set_id}.{instance.id}",
 )
-@reversion.register
+@reversion.register(follow=['prefix_set'])
 class Prefix(HandleRefModel):
     """
     Represents an IP network prefix within a set.
