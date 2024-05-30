@@ -194,6 +194,7 @@ $ctl.application.Prefixctl.PrefixSets = $tc.extend(
           this.toggle_prefixes(row.data("apiobject"), row)
         });
 
+        prefixSets = JSON.parse(localStorage.getItem("PrefixSets")) || {};
         const name_field = row.find('td[data-field="name"]')
         const prefixsetDate = new Date(data.created);
         const currentDate = new Date();
@@ -201,7 +202,11 @@ $ctl.application.Prefixctl.PrefixSets = $tc.extend(
 
         const millisecondsInADay = 1000 * 60 * 60 * 24;
         const daysDifference = Math.floor(timeDifference / millisecondsInADay);
-        localStorage.setItem("PrefixSet-" + data.name, daysDifference);
+        
+        // Set and store prefixset name with days old in localStorage sub object
+        prefixSets[`PrefixSet-${data.id}-${data.name}`] = daysDifference
+        localStorage.setItem("PrefixSets", JSON.stringify(prefixSets));
+
         const dayText = daysDifference === 1 ? 'day' : 'days';
         name_field.html(name_field.html() + `<span style="font-weight: normal;font-size: 15px">(${daysDifference} ${dayText} old)</span>`)
 
@@ -776,9 +781,9 @@ $ctl.application.Prefixctl.AddPrefixForm = $tc.extend(
 
 function removePrefix(str, prefix) {
   if (str.startsWith(prefix)) {
-      return str.substring(prefix.length);
+      str = str.slice(prefix.length);
   }
-  return str;
+  return str.replace(/^\d+-/, '');
 }
   
 $ctl.application.Prefixctl.PrefixSetRemovalWidget = $tc.extend(
@@ -789,20 +794,26 @@ $ctl.application.Prefixctl.PrefixSetRemovalWidget = $tc.extend(
     },
 
     submit: function(method) {
-      const prefix_sets = []
-      for (let i=0;i<localStorage.length;i++){
-        const key = localStorage.key(i);
-        if (key.startsWith("PrefixSet")){
-          const value = localStorage.getItem(key);
-          if (value >= this.payload().days){
-            let result = removePrefix(key, "PrefixSet-");
-            prefix_sets.push(result)
+      const prefixSetsKey = "PrefixSets";
+      // Fetch the prefixSets object from localstorage
+      let prefixSets = JSON.parse(localStorage.getItem(prefixSetsKey)) || {};
+
+      const prefix_sets = [];
+      const daysThreshold = this.payload().days;
+
+      // Iterate through the prefixSets localstorage object and store prefix sets older than the daysThreshold
+      for (const key in prefixSets) {
+        if (prefixSets.hasOwnProperty(key)) {
+          const prefix_set_days_old = prefixSets[key];
+          if (prefix_set_days_old >= daysThreshold) {
+            const result = removePrefix(key, "PrefixSet-");
+            prefix_sets.push(result);
           }
         }
-
       }
+      const prefix_sets_list = prefix_sets.join('\n');
       const confirmation = confirm(
-        `Remove PrefixSets older ${this.payload().days} than old?\n${prefix_sets}`
+        `Remove Prefix Sets older than ${daysThreshold} days?\nThese include;\n\n${prefix_sets_list} `
       );
       if (!confirmation) {
         return false;
