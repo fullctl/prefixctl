@@ -49,6 +49,7 @@ class PrefixSet(ModelSerializer):
         model = models.PrefixSet
         fields = [
             "instance",
+            "slug",
             "name",
             "description",
             "prefixes",
