@@ -194,6 +194,22 @@ $ctl.application.Prefixctl.PrefixSets = $tc.extend(
           this.toggle_prefixes(row.data("apiobject"), row)
         });
 
+        prefixSets = JSON.parse(localStorage.getItem("PrefixSets")) || {};
+        const name_field = row.find('td[data-field="name"]')
+        const prefixsetDate = new Date(data.created);
+        const currentDate = new Date();
+        const timeDifference = currentDate - prefixsetDate;
+
+        const millisecondsInADay = 1000 * 60 * 60 * 24;
+        const daysDifference = Math.floor(timeDifference / millisecondsInADay);
+        
+        // Set and store prefixset name with days old in localStorage sub object
+        prefixSets[`PrefixSet-${data.id}-${data.name}`] = daysDifference
+        localStorage.setItem("PrefixSets", JSON.stringify(prefixSets));
+
+        const dayText = daysDifference === 1 ? 'day' : 'days';
+        name_field.html(name_field.html() + `<span style="font-weight: normal;font-size: 15px">(${daysDifference} ${dayText} old)</span>`)
+
         const add_monitor_button = row.find('a[data-action="add_monitor"]');
         if (this.is_user_add_monitor_allowed()) {
           add_monitor_button.click(() => {
@@ -288,6 +304,10 @@ $ctl.application.Prefixctl.PrefixSets = $tc.extend(
 
     prompt_add_prefix_set : function() {
       return new $ctl.application.Prefixctl.ModalPrefixSet();
+    },
+
+    prompt_remove_prefix_sets : function() {
+      return new $ctl.application.Prefixctl.RemovePrefixSets();
     },
 
     prompt_edit_prefix_set : function(prefix_set) {
@@ -399,6 +419,10 @@ $ctl.application.Prefixctl.PrefixSets = $tc.extend(
       let menu = this.Tool_menu();
       menu.find('[data-element="button_add_prefix_set"]').click(() => {
         this.prompt_add_prefix_set();
+      });
+
+      menu.find('[data-element="button_schedule_remove_prefix_sets"]').click(() => {
+        this.prompt_remove_prefix_sets();
       });
 
 
@@ -754,6 +778,81 @@ $ctl.application.Prefixctl.AddPrefixForm = $tc.extend(
   },
   twentyc.rest.Form
 );
+
+function removePrefix(str, prefix) {
+  if (str.startsWith(prefix)) {
+      str = str.slice(prefix.length);
+  }
+  return str.replace(/^\d+-/, '');
+}
+  
+$ctl.application.Prefixctl.PrefixSetRemovalWidget = $tc.extend(
+  "PrefixSetRemovalWidget",
+  {
+    PrefixSetRemovalWidget : function(jq) {
+      this.Form(jq);
+    },
+
+    submit: function(method) {
+      const prefixSetsKey = "PrefixSets";
+      // Fetch the prefixSets object from localstorage
+      let prefixSets = JSON.parse(localStorage.getItem(prefixSetsKey)) || {};
+
+      const prefix_sets = [];
+      const daysThreshold = this.payload().days;
+
+      // Iterate through the prefixSets localstorage object and store prefix sets older than the daysThreshold
+      for (const key in prefixSets) {
+        if (prefixSets.hasOwnProperty(key)) {
+          const prefix_set_days_old = prefixSets[key];
+          if (prefix_set_days_old >= daysThreshold) {
+            const result = removePrefix(key, "PrefixSet-");
+            prefix_sets.push(result);
+          }
+        }
+      }
+      const prefix_sets_list = prefix_sets.join('\n');
+      const confirmation = confirm(
+        `Remove Prefix Sets older than ${daysThreshold} days?\nThese include;\n\n${prefix_sets_list} `
+      );
+      if (!confirmation) {
+        return false;
+      }
+
+      this.Form_submit(method)
+    },
+  },
+  twentyc.rest.Form
+);
+
+/**
+ * Modal for removing prefix sets that are older than the specified number of days
+*/
+$ctl.application.Prefixctl.RemovePrefixSets = $tc.extend(
+  "RemovePrefixSets",
+  {
+    RemovePrefixSets : function(jq) {
+      var form = this.form = new $ctl.application.Prefixctl.PrefixSetRemovalWidget(
+        $ctl.template("form_old_prefixsets_removal")
+      );
+      var modal = this;
+      var title = "Remove Prefix Sets"
+
+      $(this.form).on(
+        "api-write:success",
+        function(event, endpoint, payload, response) {
+          var list = $ctl.prefixctl.$t.prefix_sets.$w.list;
+          list.load()
+          modal.hide();
+        }
+      );
+      this.Modal("save_right", title, form.element);
+      form.wire_submit(this.$e.button_submit);
+
+    },
+  },
+  $ctl.application.Modal
+)
 
 $ctl.application.Prefixctl.ModalPrefixSet = $tc.extend(
   "ModalPrefixSet",

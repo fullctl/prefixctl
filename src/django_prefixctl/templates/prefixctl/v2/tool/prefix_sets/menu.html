@@ -5,14 +5,19 @@
       <div class="col">
         <span class="heading">{% trans "Prefix Sets" %}</span>
       </div>
-      <button type="button" class="primary col-md-auto btn ms-auto d-flex" data-element="button_add_prefix_set">
-        <div class="row align-items-center">
-          <div class="col label pe-0">{% trans "Add Prefix Set" %}</div>
-          <div class="col-auto">
-            <span class="icon icon-add"></span>
+      <div class="col">
+        <button type="button" class="primary col-md-auto btn ms-auto d-flex" data-element="button_add_prefix_set" style="margin-bottom: 10px;">
+          <div class="row align-items-center">
+            <div class="col label pe-0">{% trans "Add Prefix Set" %}</div>
+            <div class="col-auto">
+              <span class="icon icon-add"></span>
+            </div>
           </div>
-        </div>
-      </button>
+        </button>
+        <button type="button" class="primary col-md-auto btn ms-auto d-flex" data-element="button_schedule_remove_prefix_sets" >
+          {% trans "Remove old Prefix Sets" %}
+        </button>
+      </div>
     </div>
     <div class="row">
       <div class="col-md-4">

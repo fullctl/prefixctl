@@ -303,3 +303,10 @@ class AlertRecipient(ModelSerializer):
             "typ",
             "recipient",
         ]
+
+
+class DeletePrefixSetsSerializer(serializers.Serializer):
+    days = serializers.IntegerField(min_value=0, required=True)
+
+    class Meta:
+        fields = ["days"]

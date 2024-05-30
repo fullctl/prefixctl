@@ -1,16 +1,23 @@
+from datetime import timedelta
+from typing import Any, Tuple, Dict
+
 from fullctl.django.rest.core import BadRequest
 from fullctl.django.rest.decorators import load_object
 from fullctl.django.rest.mixins import CachedObjectMixin, SlugObjectMixin
+from fullctl.django.models import Instance, Organization
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework import status
+from django.utils import timezone
+from django.http import HttpRequest
 
 import django_prefixctl.models as models
 from django_prefixctl.rest.api_schema import ASNSetSchema, PrefixSetSchema
 from django_prefixctl.rest.decorators import grainy_endpoint
 from django_prefixctl.rest.route.prefixctl import route
 from django_prefixctl.rest.serializers.monitor import Serializers as MonitorSerializers
-from django_prefixctl.rest.serializers.prefixctl import Serializers
+from django_prefixctl.rest.serializers.prefixctl import Serializers, DeletePrefixSetsSerializer
 from django_prefixctl.rest.views.monitor import (
     add_monitor,
     list_monitors,
@@ -318,6 +325,37 @@ class PrefixSet(CachedObjectMixin, SlugObjectMixin, viewsets.GenericViewSet):
         prefix.delete()
 
         return response
+
+    
+    @action(
+        detail=False,
+        methods=["POST"],
+    )
+    @grainy_endpoint(namespace="prefix_set.{request.org.permission_id}")
+    def delete_prefixsets(self, request: HttpRequest, org: Organization, instance: Instance, *args: Tuple[Any, ...], **kwargs: Dict[str, Any]) -> Response:
+        """
+        Delete all prefixSets older than the given days.
+
+        Arguments:
+        - request: The HTTP request object.
+        - org: The organization object.
+        - instance: The instance associated with the PrefixSets.
+        - args: Additional positional arguments.
+        - kwargs: Additional keyword arguments.
+        """
+        serializer = DeletePrefixSetsSerializer(data=request.data)
+        if serializer.is_valid():
+            days = serializer.validated_data['days']
+            cutoff_date = timezone.now() - timedelta(days=days)
+            org_prefix_sets = instance.prefix_set_set.filter(created__lt=cutoff_date)
+
+            for prefix_set in org_prefix_sets:
+                prefix_set.delete()
+
+            return Response({"success": True})
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
     @action(
         detail=True, methods=["POST"], serializer_class=Serializers.bulk_create_prefixes
