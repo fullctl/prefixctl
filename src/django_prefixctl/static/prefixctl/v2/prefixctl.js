@@ -186,6 +186,8 @@ $ctl.application.Prefixctl.PrefixSets = $tc.extend(
         );
       })
 
+      let prefixSets = {};
+
       this.$w.list.formatters.row = (row, data) => {
         row.find('a[data-action="edit_prefix_set"]').click(() => {
           this.prompt_edit_prefix_set(row.data("apiobject"))
@@ -194,21 +196,21 @@ $ctl.application.Prefixctl.PrefixSets = $tc.extend(
           this.toggle_prefixes(row.data("apiobject"), row)
         });
 
-        prefixSets = JSON.parse(localStorage.getItem("PrefixSets")) || {};
         const name_field = row.find('td[data-field="name"]')
         const prefixsetDate = new Date(data.created);
         const currentDate = new Date();
         const timeDifference = currentDate - prefixsetDate;
 
         const millisecondsInADay = 1000 * 60 * 60 * 24;
-        const daysDifference = Math.floor(timeDifference / millisecondsInADay);
+        let daysDifference = Math.floor(timeDifference / millisecondsInADay);
+        if(daysDifference < 0){ daysDifference = 0}
         
         // Set and store prefixset name with days old in localStorage sub object
         prefixSets[`PrefixSet-${data.id}-${data.name}`] = daysDifference
         localStorage.setItem("PrefixSets", JSON.stringify(prefixSets));
 
         const dayText = daysDifference === 1 ? 'day' : 'days';
-        name_field.html(name_field.html() + `<span style="font-weight: normal;font-size: 15px">(${daysDifference} ${dayText} old)</span>`)
+        name_field.html(name_field.html() + `<span style="font-weight: normal;font-size: 15px">  (${daysDifference} ${dayText} old)</span>`)
 
         const add_monitor_button = row.find('a[data-action="add_monitor"]');
         if (this.is_user_add_monitor_allowed()) {
