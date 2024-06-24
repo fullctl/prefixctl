@@ -124,6 +124,8 @@ class PrefixSetAdmin(VersionAdmin, ReversionAdmin):
         IRRImporterInline,
         PrefixInline,
     )
+    # enable latest deleted items to be shown from top to bottom
+    history_latest_first = True
 
     def org(self, obj):
         return obj.instance.org
