@@ -236,7 +236,7 @@ $ctl.application.Prefixctl.PrefixSets = $tc.extend(
           else {
             prefixes.each(function(element) {
               let title = $(this).find('.prefix').text().toLowerCase();
-              (title.startsWith(keyword)) ? $(this).show() : $(this).hide();
+              (title.includes(keyword)) ? $(this).show() : $(this).hide();
             });
           }
         });
@@ -620,7 +620,7 @@ $ctl.application.Prefixctl.PrefixSetList = $tc.extend(
               const prefixes = $(this).data("prefix-list").list_body.find(".prefix-container");
               prefixes.each(function() {
                 const title = $(this).find('.prefix').text().toLowerCase();
-                if (title.startsWith(search_term)) {
+                if (title.includes(search_term)) {
                   matched_elements.push($(this));
                   $(this).show()
                 } else {

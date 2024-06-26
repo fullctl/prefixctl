@@ -79,7 +79,7 @@ class PrefixSet(CachedObjectMixin, SlugObjectMixin, viewsets.GenericViewSet):
         - kwargs: Additional keyword arguments.
         """
         search_term = request.query_params.get("q", "")
-        prefixes = models.Prefix.objects.filter(prefix__startswith=search_term)
+        prefixes = models.Prefix.objects.filter(prefix__contains=search_term)
 
         serializer = Serializers.prefix(prefixes, many=True)
         return Response(serializer.data)
