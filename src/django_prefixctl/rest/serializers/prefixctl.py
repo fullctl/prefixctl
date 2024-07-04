@@ -2,7 +2,8 @@ from django.utils.translation import gettext_lazy as _
 from fullctl.django.rest.decorators import serializer_registry
 from fullctl.django.rest.fields import DynamicChoiceField
 from fullctl.django.rest.serializers import ModelSerializer, SlugSerializerMixin
-from fullctl.django.validators import validate_alphanumeric, validate_alphanumeric_list
+from fullctl.django.validators import validate_alphanumeric_list
+from fullctl.django.inet.validators import validate_as_set
 from rest_framework import serializers
 
 import django_prefixctl.models as models
@@ -79,7 +80,7 @@ class PrefixSet(SlugSerializerMixin, ModelSerializer):
         allow_blank=True,
         allow_null=True,
         validators=[
-            validate_alphanumeric,
+            validate_as_set,
         ],
     )
 
