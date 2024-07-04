@@ -14,7 +14,8 @@ from fullctl.django.models.abstract.alert import AlertRecipient as AlertRecipien
 from fullctl.django.models.abstract.base import HandleRefModel, SlugModel
 from fullctl.django.models.concrete import Instance
 from fullctl.django.models.concrete.tasks import Monitor, Task, TaskSchedule
-from fullctl.django.validators import validate_alphanumeric, validate_alphanumeric_list
+from fullctl.django.validators import validate_alphanumeric_list
+from fullctl.django.inet.validators import validate_as_set
 from netfields import CidrAddressField
 
 __all__ = (
@@ -211,7 +212,7 @@ class PrefixSet(SlugModel):
         blank=True,
         null=True,
         help_text=_("import prefixes for AS-SET"),
-        validators=(validate_alphanumeric,),
+        validators=(validate_as_set,),
     )
 
     # TODO: user centric preferences?
