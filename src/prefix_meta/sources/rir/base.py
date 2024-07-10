@@ -55,7 +55,7 @@ class RdapRequest(Request):
 
     @classmethod
     def rdap_request(cls, target):
-        client = rdap.RdapClient()
+        client = rdap.RdapClient(config={"ignore_recurse_errors": True})
         try:
             data = client.get(f"{target}")
         except rdap.exceptions.RdapNotFoundError:
