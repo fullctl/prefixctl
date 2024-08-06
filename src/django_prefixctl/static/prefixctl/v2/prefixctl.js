@@ -125,9 +125,14 @@ $ctl.application.Prefixctl.PrefixSetMonitors = new $ctl.application.Prefixctl.Mo
 // asn set monitors
 $ctl.application.Prefixctl.ASNSetMonitors = new $ctl.application.Prefixctl.Monitors();
 
+
 $ctl.application.Prefixctl.PrefixMonitorList = $tc.extend(
   "PrefixMonitorList",
   {
+    PrefixMonitorList: function(jq) {
+      this.List(jq);
+      $($ctl).trigger('prefixctl-monitor-list', [this])
+    },
     build_row : function(data) {
 
       const monitor_type = data.monitor_type;
@@ -204,7 +209,7 @@ $ctl.application.Prefixctl.PrefixSets = $tc.extend(
         const millisecondsInADay = 1000 * 60 * 60 * 24;
         let daysDifference = Math.floor(timeDifference / millisecondsInADay);
         if(daysDifference < 0){ daysDifference = 0}
-        
+
         // Set and store prefixset name with days old in localStorage sub object
         prefixSets[`PrefixSet-${data.id}-${data.name}`] = daysDifference
         localStorage.setItem("PrefixSets", JSON.stringify(prefixSets));
@@ -787,7 +792,7 @@ function removePrefix(str, prefix) {
   }
   return str.replace(/^\d+-/, '');
 }
-  
+
 $ctl.application.Prefixctl.PrefixSetRemovalWidget = $tc.extend(
   "PrefixSetRemovalWidget",
   {
@@ -1008,7 +1013,7 @@ $ctl.application.Prefixctl.ModalMonitorBase = $tc.extend(
       }
 
       this.modal();
-
+      
       form.wire_submit(this.$e.button_submit);
       return form;
     },
