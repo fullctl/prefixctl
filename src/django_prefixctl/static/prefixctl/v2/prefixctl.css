@@ -138,6 +138,14 @@ td[data-field="country"] a {
   margin-left: 1ch;
 }
 
+.form-check {
+  margin-top: 10px;
+}
+
+.form-check-input {
+  margin-right: 10px;
+}
+
 /* ASN Sets */
 
 /* TODO: remove when https://bugzilla.mozilla.org/show_bug.cgi?id=1000435 is fixed */

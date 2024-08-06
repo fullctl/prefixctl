@@ -216,6 +216,7 @@ class PrefixSet(SlugModel):
     )
 
     # TODO: user centric preferences?
+
     ux_keep_list_open = models.BooleanField(
         default=False, help_text=_("UX Preference: Keep prefix list expanded")
     )
@@ -590,7 +591,7 @@ class AlertLogRecipient(AlertRecipientBase):
     Attributes:
     alertlog: Foreign key to the AlertLog this recipient is associated with.
     """
-
+    
     alertlog = models.ForeignKey(
         AlertLog, related_name="alert_log_recipient_set", on_delete=models.CASCADE
     )
