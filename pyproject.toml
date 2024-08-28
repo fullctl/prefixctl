@@ -64,7 +64,9 @@ Jinja2 = ">=3"
 optional = true
 
 [tool.poetry.group.tasks.dependencies]
-playwright = ">=1.31.1"
+# >= 1.45 currently breaks anchor links in PDFs
+# possibly related: https://github.com/puppeteer/puppeteer/issues/12869
+playwright = ">=1.31.1,<1.45"
 
 [tool.ruff]
 # Same as Black.
