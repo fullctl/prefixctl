@@ -1,23 +1,22 @@
 Unreleased:
-  added: []
-  fixed: []
+  added:
+  - prefixctl-meta is now included in the core prefixctl package
+  - PrefixSet search
+  - Deletion of PrefixSets based on age
+  - ripestat prefix-meta source
+  fixed:
+  - IRR as-set validation issues
   changed: []
   deprecated: []
   removed: []
   security: []
 1.2.0:
   added:
-  - prefixctl-meta is now included in the core prefixctl package
   - Standalone auth support using django-admin
   - tests (84% coverage)
   - '`PrefixSet` `slug` field'
   - '`ASNSet` `slug` field'
   - additional documentation and revised example monitor setup guide.
-  - PrefixSet search
-  - Deletion of PrefixSets based on age
-  - null
-  fixed:
-  - IRR as-set validation issues
   changed:
   - ASNSet management moved to own section in UX
 1.0.0:
