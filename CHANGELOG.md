@@ -2,6 +2,9 @@
 
 
 ## Unreleased
+
+
+## 1.3.0
 ### Added
 - prefixctl-meta is now included in the core prefixctl package
 - PrefixSet search

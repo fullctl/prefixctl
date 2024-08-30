@@ -1,4 +1,11 @@
 Unreleased:
+  added: []
+  fixed: []
+  changed: []
+  deprecated: []
+  removed: []
+  security: []
+1.3.0:
   added:
   - prefixctl-meta is now included in the core prefixctl package
   - PrefixSet search
@@ -6,10 +13,6 @@ Unreleased:
   - ripestat prefix-meta source
   fixed:
   - IRR as-set validation issues
-  changed: []
-  deprecated: []
-  removed: []
-  security: []
 1.2.0:
   added:
   - Standalone auth support using django-admin
