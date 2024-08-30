@@ -1,8 +1,9 @@
 {% load static i18n %}
 <table
-  class="table table-borderless"
+  class="table table-borderless loading-container"
   data-api-base="{% url "prefixctl_api:prefix_set-list" org_tag=request.org.slug %}"
-  data-template="list">
+  data-template="list"
+>
   <tbody class="list-body">
   </tbody>
   <tbody class="templates">

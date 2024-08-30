@@ -1,4 +1,7 @@
 from django.contrib import admin
+from django_handleref.admin import VersionAdmin
+from reversion.admin import VersionAdmin as ReversionAdmin
+
 
 from django_prefixctl.models import (
     AlertGroup,
@@ -103,7 +106,7 @@ class IRRImporterInline(admin.TabularInline):
 
 
 @admin.register(PrefixSet)
-class PrefixSetAdmin(admin.ModelAdmin):
+class PrefixSetAdmin(VersionAdmin, ReversionAdmin):
     list_display = (
         "id",
         "slug",
@@ -121,6 +124,8 @@ class PrefixSetAdmin(admin.ModelAdmin):
         IRRImporterInline,
         PrefixInline,
     )
+    # enable latest deleted items to be shown from top to bottom
+    history_latest_first = True
 
     def org(self, obj):
         return obj.instance.org

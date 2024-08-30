@@ -1,0 +1,51 @@
+{
+    "first_seen": {
+        "origin": "397735",
+        "prefix": "216.176.40.0/22",
+        "time": "2020-08-08T16:00:00"
+    },
+    "last_seen": {
+        "origin": "397735",
+        "prefix": "216.176.40.0/22",
+        "time": "2023-12-14T16:00:00"
+    },
+    "less_specifics": [],
+    "more_specifics": [
+        {
+            "origin": 397735,
+            "prefix": "216.176.40.0/24"
+        },
+        {
+            "origin": 397735,
+            "prefix": "216.176.41.0/24"
+        },
+        {
+            "origin": 397735,
+            "prefix": "216.176.42.0/24"
+        },
+        {
+            "origin": 397735,
+            "prefix": "216.176.43.0/24"
+        }
+    ],
+    "origins": [],
+    "query_time": "2024-06-10T08:00:00",
+    "resource": "216.176.40.0/22",
+    "rpki_status": {
+        "prefix": "216.176.40.0/22",
+        "resource": "397735",
+        "status": "unknown",
+        "validating_roas": [],
+        "validator": "routinator"
+    },
+    "visibility": {
+        "v4": {
+            "ris_peers_seeing": 0,
+            "total_ris_peers": 313
+        },
+        "v6": {
+            "ris_peers_seeing": 0,
+            "total_ris_peers": 0
+        }
+    }
+}
