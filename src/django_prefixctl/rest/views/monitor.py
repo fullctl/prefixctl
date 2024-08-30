@@ -83,6 +83,7 @@ def add_monitor(request, instance, data: dict) -> Response:
     if not request.perms.check(serializer.grainy_namespace, "create"):
         return Response(status=status.HTTP_403_FORBIDDEN)
 
+    # Create the monitor instance using serializer.create()
     monitor = serializer.create(serializer.validated_data)
 
     return Response(
@@ -197,7 +198,7 @@ class Monitor(viewsets.GenericViewSet):
 
         serializer.update(monitor, serializer.validated_data)
 
-        return Response(serializer.data)
+        return Response(serializer_cls(instance=monitor).data)
 
     # using a generic service namespace for access to this endpoint
     # permission for deletion will be checked against the object being updated
@@ -206,5 +207,5 @@ class Monitor(viewsets.GenericViewSet):
         """
         Remove a monitor for a given organization instance
         """
-
+        
         return remove_monitor(request, instance, request.data)

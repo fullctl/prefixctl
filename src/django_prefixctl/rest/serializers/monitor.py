@@ -52,7 +52,6 @@ def get_monitor_class(type):
     Returns:
     The class of the specified monitor type.
     """
-    print("MONITORS", MONITOR_CLASSES)
     return MONITOR_CLASSES[type]
 
 
@@ -119,9 +118,8 @@ class MonitorCreationMixin:
     def grainy_namespace(self):
         monitor_serializer = get_monitor_class(self.validated_data["monitor_type"])
         org = self.context.get("instance").org
-        return (
-            monitor_serializer.Meta.model.Grainy.namespace() + f".{org.permission_id}"
-        )
+        namespace = monitor_serializer.Meta.model.Grainy.namespace() + f".{org.permission_id}"
+        return namespace
 
     def create(self, validated_data, **kwargs):
         """
@@ -141,7 +139,8 @@ class MonitorCreationMixin:
         except KeyError:
             pass
 
-        return super().create(validated_data, **kwargs)
+        instance = super().create(validated_data, **kwargs)
+        return instance
 
 
 @register_asn_monitor

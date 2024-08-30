@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "prefixctl"
 repository = "https://github.com/fullctl/prefixctl"
-version = "1.0.0"
+version = "1.2.0"
 description = "prefix control"
 authors = ["20C <code@20c.com>"]
 license = "Apache-2.0"
@@ -26,6 +26,11 @@ prefixctl = "prefixctl.cli:main"
 [tool.poetry.dependencies]
 python = "^3.9"
 fullctl = { git = "https://github.com/fullctl/fullctl.git", branch = "prep-release" }
+pygments = "^2.14"
+rdap = "^1.5"
+xmltodict = "^0.13.0"
+structlog = ">=23.1.0"
+pydantic = ">=2.6.3"
 
 [tool.poetry.dev-dependencies]
 # testing
@@ -59,7 +64,9 @@ Jinja2 = ">=3"
 optional = true
 
 [tool.poetry.group.tasks.dependencies]
-playwright = ">=1.31.1"
+# >= 1.45 currently breaks anchor links in PDFs
+# possibly related: https://github.com/puppeteer/puppeteer/issues/12869
+playwright = ">=1.31.1,<1.45"
 
 [tool.ruff]
 # Same as Black.

@@ -30,7 +30,8 @@ tr.prelist {
   display: inline-block;
 }
 
-.prefix-container .dropdown-toggle {
+.prefix-container .dropdown-toggle,
+.prefix-container button {
   background-color: transparent;
   border: 1px solid transparent;
   border-radius: 4px;
@@ -95,7 +96,7 @@ tr.monitor-details td div.row div{
   border-left: 4px solid var(--clr-accent-500);
 }
 
-.rep-issues {
+.rep-issues, .status-row.orange-border {
   background:  var(--clr-accent-500) !important;
 }
 
@@ -103,19 +104,30 @@ tr.monitor-details td div.row div{
   border-left: 4px solid var(--clr-accent-400);
 }
 
-.rep-ok {
+.rep-ok, .status-row.green-border {
   background:  var(--clr-accent-400) !important;
 }
 
 .rep-issues,
 .rep-ok {
   border: none !important;
-  color: #000;
+  color: #000 !important;
 }
 
-.field.rep-status.rep-issues,
-.field.rep-status.rep-ok {
-  color: #000;
+.status-row.green-border .rep-status.field, 
+.status-row.orange-border .rep-status.field, 
+.status-row.green-border,
+.status-row.orange-border {
+  color: #000 !important;
+}
+
+.status-row.green-border .rep-status .icon,
+.status-row.orange-border .rep-status .icon {
+  background: #000 !important;
+}
+
+.status-row.red-border .rep-status .icon {
+  background: #FFF !important;
 }
 
 td[data-field="country"] a {
@@ -124,6 +136,14 @@ td[data-field="country"] a {
 
 .prefix-addon-controls {
   margin-left: 1ch;
+}
+
+.form-check {
+  margin-top: 10px;
+}
+
+.form-check-input {
+  margin-right: 10px;
 }
 
 /* ASN Sets */

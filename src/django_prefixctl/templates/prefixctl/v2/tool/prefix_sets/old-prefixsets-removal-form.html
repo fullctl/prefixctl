@@ -1,0 +1,13 @@
+{% load static i18n %}
+<form data-template="form_old_prefixsets_removal"
+  data-api-base="{% url "prefixctl_api:prefix_set-delete-prefixsets" org_tag=request.org.slug %}"
+  data-api-method="POST"
+  >
+  <div class="container-fluid">
+    <div class="row mb-3">
+      <div class="col-12" data-api-submit="yes">
+        <label for="days">Remove Prefix Sets Older than <input type="text" id="days" name="days" placeholder="Enter number of days"> days</label>
+      </div>
+    </div>
+  </div>
+</form>

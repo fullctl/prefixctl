@@ -14,7 +14,8 @@ from fullctl.django.models.abstract.alert import AlertRecipient as AlertRecipien
 from fullctl.django.models.abstract.base import HandleRefModel, SlugModel
 from fullctl.django.models.concrete import Instance
 from fullctl.django.models.concrete.tasks import Monitor, Task, TaskSchedule
-from fullctl.django.validators import validate_alphanumeric, validate_alphanumeric_list
+from fullctl.django.validators import validate_alphanumeric_list
+from fullctl.django.inet.validators import validate_as_set
 from netfields import CidrAddressField
 
 __all__ = (
@@ -164,7 +165,7 @@ class ASN(HandleRefModel):
     namespace="prefix",
     namespace_instance="prefix.{instance.org.permission_id}.{instance.id}",
 )
-@reversion.register
+@reversion.register(follow=['prefix_set'])
 class PrefixSet(SlugModel):
     """
     Represents a set of IP network prefixes.
@@ -211,10 +212,11 @@ class PrefixSet(SlugModel):
         blank=True,
         null=True,
         help_text=_("import prefixes for AS-SET"),
-        validators=(validate_alphanumeric,),
+        validators=(validate_as_set,),
     )
 
     # TODO: user centric preferences?
+
     ux_keep_list_open = models.BooleanField(
         default=False, help_text=_("UX Preference: Keep prefix list expanded")
     )
@@ -386,7 +388,7 @@ class PrefixSetIRRImporter(Monitor):
     namespace="prefix",
     namespace_instance="prefix.{instance.prefix_set.org.permission_id}.{instance.prefix_set_id}.{instance.id}",
 )
-@reversion.register
+@reversion.register(follow=['prefix_set'])
 class Prefix(HandleRefModel):
     """
     Represents an IP network prefix within a set.
@@ -589,7 +591,7 @@ class AlertLogRecipient(AlertRecipientBase):
     Attributes:
     alertlog: Foreign key to the AlertLog this recipient is associated with.
     """
-
+    
     alertlog = models.ForeignKey(
         AlertLog, related_name="alert_log_recipient_set", on_delete=models.CASCADE
     )
