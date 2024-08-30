@@ -2,6 +2,9 @@
 
 
 ## Unreleased
+
+
+## 1.2.0
 ### Added
 - prefixctl-meta is now included in the core prefixctl package
 - Standalone auth support using django-admin
